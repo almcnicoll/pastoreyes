@@ -1,0 +1,32 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('person_entry', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('person_id')->constrained()->cascadeOnDelete();
+            $table->unsignedBigInteger('entryable_id');
+            $table->string('entryable_type');
+            $table->boolean('is_primary')->default(true);        // distinguishes main subject from secondary people
+            $table->timestamps();
+
+            // Prevent duplicate links between the same person and entry
+            $table->unique(['person_id', 'entryable_id', 'entryable_type']);
+
+            // Index for querying from the timeline side
+            $table->index(['entryable_type', 'entryable_id']);
+            $table->index('person_id');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('person_entry');
+    }
+};

@@ -6,25 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
+            $table->string('first_name');                        // encrypted at app layer
+            $table->string('last_name');                         // encrypted at app layer
+            $table->string('email')->unique();                   // unencrypted - used for lookups
+            $table->string('google_oauth_id')->unique();         // unencrypted - Google's unique user ID
+            $table->text('google_oauth_token')->nullable();      // encrypted - API access token
+            $table->text('google_oauth_refresh_token')->nullable(); // encrypted - for token refresh
+            $table->timestamp('google_token_expires_at')->nullable();
+            $table->string('encryption_salt');                   // generated on first login, never changes
+            $table->boolean('is_active')->default(true);
+            $table->boolean('is_admin')->default(false);
+            $table->timestamp('last_login_at')->nullable();
             $table->timestamps();
-        });
-
-        Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
         });
 
         Schema::create('sessions', function (Blueprint $table) {
@@ -37,13 +34,9 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
+        Schema::dropIfExists('users');
     }
 };
