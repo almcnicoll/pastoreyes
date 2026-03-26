@@ -1,6 +1,11 @@
 <?php
 
 use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Livewire\Dashboard;
+use App\Livewire\People\PeopleIndex;
+use App\Livewire\People\PersonShow;
+use App\Livewire\Timeline;
+use App\Livewire\Settings;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -42,31 +47,16 @@ Route::post('/logout', [GoogleAuthController::class, 'logout'])
 Route::middleware(['auth', 'active'])->group(function () {
 
     // Dashboard
-    Route::get('/', function () {
-        return redirect()->route('dashboard');
-    });
+    Route::get('/', fn() => redirect()->route('dashboard'));
 
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', Dashboard::class)->name('dashboard');
 
-    // People
-    Route::get('/people', function () {
-        return view('people.index');
-    })->name('people.index');
+    Route::get('/people', PeopleIndex::class)->name('people.index');
 
-    Route::get('/people/{person}', function (\App\Models\Person $person) {
-        return view('people.show', compact('person'));
-    })->name('people.show');
+    Route::get('/people/{person}', PersonShow::class)->name('people.show');
 
-    // Timeline
-    Route::get('/timeline', function () {
-        return view('timeline');
-    })->name('timeline');
+    Route::get('/timeline', Timeline::class)->name('timeline');
 
-    // Settings
-    Route::get('/settings', function () {
-        return view('settings');
-    })->name('settings');
+    Route::get('/settings', Settings::class)->name('settings');
 
 });
