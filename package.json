@@ -14,7 +14,8 @@
     },
     "dependencies": {
         "alpinejs": "^3.13.0",
-        "cytoscape": "^3.28.0",
+        "axios": "^1.13.6",
+        "cytoscape": "^3.33.1",
         "flowbite": "^2.3.0"
     }
 }
