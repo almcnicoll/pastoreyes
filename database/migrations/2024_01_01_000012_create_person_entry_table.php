@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('person_entry', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('person_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('person_id')->constrained('persons')->cascadeOnDelete();
             $table->unsignedBigInteger('entryable_id');
             $table->string('entryable_type');
             $table->boolean('is_primary')->default(true);        // distinguishes main subject from secondary people

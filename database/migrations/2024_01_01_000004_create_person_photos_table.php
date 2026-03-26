@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('person_photos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('person_id')->unique()->constrained()->cascadeOnDelete();
+            $table->foreignId('person_id')->unique()->constrained('persons')->cascadeOnDelete();
             $table->longText('data');                            // encrypted at app layer - base64 encoded image
             $table->string('mime_type');                         // encrypted at app layer
             $table->unsignedInteger('file_size');                // unencrypted - stored in bytes

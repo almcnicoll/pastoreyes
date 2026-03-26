@@ -1,4 +1,4 @@
-<div>
+<div wire:init="checkCalendarSync">
     {{-- Person Header --}}
     <div class="flex items-center gap-4 mb-6">
         {{-- Back link --}}

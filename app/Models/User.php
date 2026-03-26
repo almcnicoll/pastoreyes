@@ -23,6 +23,7 @@ class User extends Authenticatable
         'is_active',
         'is_admin',
         'last_login_at',
+        'settings',
     ];
 
     protected $hidden = [
@@ -42,6 +43,7 @@ class User extends Authenticatable
             'last_login_at'              => 'datetime',
             'is_active'                  => 'boolean',
             'is_admin'                   => 'boolean',
+            'settings'                   => 'array',
         ];
     }
 

@@ -120,7 +120,27 @@
     <main class="max-w-7xl mx-auto px-4 lg:px-6 py-6">
         {{ $slot }}
     </main>
-    @stack('scripts')
+
+    {{-- Global: Link Google Contact modal (can be triggered from any page) --}}
+    <livewire:link-google-contact />
+
+    {{-- Toast Notifications --}}
+    <div
+        x-data="{ show: false, message: '' }"
+        x-on:notify.window="message = $event.detail.message; show = true; setTimeout(() => show = false, 3000)"
+        x-show="show"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 translate-y-2"
+        x-transition:enter-end="opacity-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="opacity-100 translate-y-0"
+        x-transition:leave-end="opacity-0 translate-y-2"
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-gray-800 text-white text-sm px-4 py-2.5 rounded-lg shadow-lg"
+        style="display: none;">
+        <span x-text="message"></span>
+    </div>
+
     @livewireScripts
+    @stack('scripts')
 </body>
 </html>

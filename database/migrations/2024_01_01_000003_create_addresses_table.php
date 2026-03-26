@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('addresses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('person_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('person_id')->constrained('persons')->cascadeOnDelete();
             $table->string('line_1')->nullable();                // encrypted at app layer
             $table->string('line_2')->nullable();                // encrypted at app layer
             $table->string('line_3')->nullable();                // encrypted at app layer

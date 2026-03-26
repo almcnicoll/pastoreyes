@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('relationships', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('person_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('person_id')->constrained('persons')->cascadeOnDelete();
             $table->foreignId('related_person_id')->constrained('persons')->cascadeOnDelete();
             $table->foreignId('relationship_type_id')->constrained()->restrictOnDelete();
             $table->string('notes')->nullable();                 // encrypted at app layer
@@ -20,7 +20,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Prevent duplicate relationships between the same two people with the same type
-            $table->unique(['person_id', 'related_person_id', 'relationship_type_id']);
+            $table->unique(['person_id', 'related_person_id', 'relationship_type_id'],"rships_person_id_related_person_id_rship_type_id_unique");
 
             $table->index('user_id');
             $table->index('person_id');

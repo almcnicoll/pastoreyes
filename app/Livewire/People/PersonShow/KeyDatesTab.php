@@ -2,6 +2,7 @@
 
 namespace App\Livewire\People\PersonShow;
 
+use App\Actions\SyncKeyDateToCalendar;
 use App\Models\KeyDate;
 use App\Models\Person;
 use Livewire\Component;
@@ -25,6 +26,19 @@ class KeyDatesTab extends Component
     public function mount(Person $person): void
     {
         $this->person = $person;
+    }
+
+    public function syncKeyDate(int $keyDateId, ?string $calendarId = null): void
+    {
+        $kd = KeyDate::findOrFail($keyDateId);
+        abort_if($kd->user_id !== auth()->id(), 403);
+
+        $success = (new SyncKeyDateToCalendar())->execute($kd, $calendarId);
+
+        $this->dispatch('notify', message: $success
+            ? 'Synced to Google Calendar.'
+            : 'Sync failed — check your Google connection in Settings.'
+        );
     }
 
     public function openAdd(): void
