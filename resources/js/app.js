@@ -1,17 +1,8 @@
 import './bootstrap';
 
-import Alpine from 'alpinejs';
-import { Livewire, Alpine as LivewireAlpine } from '../../vendor/livewire/livewire/dist/livewire.esm';
+import { Livewire, Alpine } from '../../vendor/livewire/livewire/dist/livewire.esm';
 import 'flowbite';
 import cytoscape from 'cytoscape';
-
-/*
-|--------------------------------------------------------------------------
-| Alpine.js
-|--------------------------------------------------------------------------
-*/
-
-window.Alpine = Alpine;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,8 +18,12 @@ window.cytoscape = cytoscape;
 
 /*
 |--------------------------------------------------------------------------
-| Livewire + Alpine Integration
+| Livewire + Alpine
 |--------------------------------------------------------------------------
+|
+| Livewire v3 bundles Alpine internally. We use that version only —
+| do NOT import alpinejs separately as it causes conflicts.
+|
 */
 
 Livewire.start();

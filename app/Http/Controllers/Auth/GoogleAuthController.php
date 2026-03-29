@@ -44,9 +44,10 @@ class GoogleAuthController extends Controller
         $user = User::firstOrCreate(
             ['google_oauth_id' => $googleUser->getId()],
             [
-                'email'      => $googleUser->getEmail(),
-                'first_name' => $googleUser->user['given_name'] ?? '',
-                'last_name'  => $googleUser->user['family_name'] ?? '',
+                'email'             => $googleUser->getEmail(),
+                'first_name'        => $googleUser->user['given_name'] ?? '',
+                'last_name'         => $googleUser->user['family_name'] ?? '',
+                'encryption_salt'   => \Illuminate\Support\Str::random(64),
             ]
         );
 
@@ -56,9 +57,6 @@ class GoogleAuthController extends Controller
                 'oauth' => 'disabled',
             ]);
         }
-
-        // Generate encryption salt on first login if not already set
-        $user->generateEncryptionSalt();
 
         // Store OAuth tokens (encrypted via model cast)
         $user->google_oauth_token         = $googleUser->token;

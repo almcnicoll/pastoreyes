@@ -1,6 +1,6 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,23 +16,23 @@
 
 :root {
     /* Entry type colours */
-    --color-note:         #3B82F6;
-    --color-prayer-need:  #8B5CF6;
-    --color-goal:         #F59E0B;
-    --color-outcome:      #10B981;
-    --color-key-date:     #EC4899;
+    --color-note: #3b82f6;
+    --color-prayer-need: #8b5cf6;
+    --color-goal: #f59e0b;
+    --color-outcome: #10b981;
+    --color-key-date: #ec4899;
 
     /* Significance badge colours */
-    --color-significance-1: #22C55E;
-    --color-significance-2: #84CC16;
-    --color-significance-3: #EAB308;
-    --color-significance-4: #F97316;
-    --color-significance-5: #EF4444;
+    --color-significance-1: #22c55e;
+    --color-significance-2: #84cc16;
+    --color-significance-3: #eab308;
+    --color-significance-4: #f97316;
+    --color-significance-5: #ef4444;
 
     /* Gender colours */
-    --color-gender-male:    #60A5FA;
-    --color-gender-female:  #F472B6;
-    --color-gender-unknown: #92400E;
+    --color-gender-male: #60a5fa;
+    --color-gender-female: #f472b6;
+    --color-gender-unknown: #92400e;
 }
 
 /*
@@ -67,8 +67,8 @@ html {
     width: 100%;
     height: 500px;
     border-radius: 0.5rem;
-    border: 1px solid #E5E7EB;
-    background: #F9FAFB;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
 }
 
 @media (min-width: 768px) {
