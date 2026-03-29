@@ -49,7 +49,7 @@ class GoogleContactsService
     {
         $response = $this->client->http()
             ->get(self::BASE_URL . '/' . $resourceName, [
-                'personFields' => 'names,emailAddresses,phoneNumbers,addresses,photos',
+                'personFields' => 'names,emailAddresses,phoneNumbers,addresses,photos,genders,birthdays,events,nicknames',
             ]);
 
         if (!$response->successful()) {
@@ -117,6 +117,7 @@ class GoogleContactsService
             'emails'        => collect($person['emailAddresses'] ?? [])->pluck('value')->toArray(),
             'phones'        => collect($person['phoneNumbers'] ?? [])->pluck('value')->toArray(),
             'addresses'     => $person['addresses'] ?? [],
+            'rawData'       => $person, // full raw response for import
         ];
     }
 
