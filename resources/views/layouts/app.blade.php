@@ -124,6 +124,9 @@
     {{-- Global: Link Google Contact modal (can be triggered from any page) --}}
     <livewire:link-google-contact />
 
+    {{-- Global: Add Person modal (can be triggered from any page) --}}
+    <livewire:people.add-person />
+
     {{-- Toast Notifications --}}
     <div
         x-data="{ show: false, message: '' }"

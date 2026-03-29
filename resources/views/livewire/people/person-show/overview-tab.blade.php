@@ -92,25 +92,9 @@
 
         {{-- Names --}}
         <div>
-            <p class="text-xs text-gray-400 mb-2">Names</p>
-            <div class="space-y-1">
-                @forelse($person->names as $name)
-                    <div class="flex items-center gap-2 text-sm">
-                        <span class="{{ $name->is_primary ? 'font-medium text-gray-800' : 'text-gray-600' }}">
-                            {{ collect([$name->first_name, $name->middle_names, $name->last_name])->filter()->implode(' ') ?: '(no name)' }}
-                        </span>
-                        <span class="text-xs text-gray-400">({{ $name->type }})</span>
-                        @if($name->spelling_uncertain)
-                            <span class="text-xs text-amber-500">spelling uncertain</span>
-                        @endif
-                        @if($name->is_primary)
-                            <span class="text-xs bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded">primary</span>
-                        @endif
-                    </div>
-                @empty
-                    <p class="text-sm text-gray-400">No names recorded.</p>
-                @endforelse
-            </div>
+            <livewire:people.person-show.manage-person-names
+                :person="$person"
+                :key="'names-'.$person->id" />
         </div>
 
         {{-- Current Address --}}
