@@ -20,10 +20,24 @@ class EncryptedCast implements CastsAttributes
         if ($model instanceof \App\Models\User) {
             $salt = $model->encryption_salt;
         } else {
-            // Otherwise get the salt from the currently authenticated user
+            // Try the authenticated user first
             $user = Auth::user();
 
-            if (!$user || !$user->encryption_salt) {
+            // If not available, try to resolve via the model's user_id
+            if (!$user && isset($model->user_id)) {
+                $user = \App\Models\User::find($model->user_id);
+            }
+
+            // For models that belong to a person (e.g. PersonName, Address),
+            // walk up to the person's user
+            if (!$user && isset($model->person_id)) {
+                $person = \App\Models\Person::find($model->person_id);
+                if ($person) {
+                    $user = \App\Models\User::find($person->user_id);
+                }
+            }
+
+            if (!$user || empty($user->encryption_salt)) {
                 throw new RuntimeException('Cannot encrypt/decrypt: no authenticated user with encryption salt.');
             }
 

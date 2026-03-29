@@ -58,6 +58,11 @@ class GoogleAuthController extends Controller
             ]);
         }
 
+        // Ensure encryption salt is set — generate if missing or empty
+        if (empty($user->encryption_salt)) {
+            $user->encryption_salt = \Illuminate\Support\Str::random(64);
+        }
+
         // Store OAuth tokens (encrypted via model cast)
         $user->google_oauth_token         = $googleUser->token;
         $user->google_oauth_refresh_token = $googleUser->refreshToken ?? $user->getRawOriginal('google_oauth_refresh_token');
