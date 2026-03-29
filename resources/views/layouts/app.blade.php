@@ -15,6 +15,7 @@
 
             {{-- Logo / App Name --}}
             <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
+                <img src="{{ asset('icons/pastoreyes-logo.png') }}" alt="PastorEyes" class="h-8 w-auto">
                 <span class="text-xl font-bold text-gray-800 tracking-tight">PastorEyes</span>
             </a>
 
