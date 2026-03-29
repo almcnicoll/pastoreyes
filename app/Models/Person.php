@@ -14,6 +14,8 @@ class Person extends Model
 {
     use HasFactory;
 
+    protected $table = 'persons';
+
     protected $fillable = [
         'user_id',
         'google_contact_id',
