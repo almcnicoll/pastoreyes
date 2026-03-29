@@ -27,9 +27,13 @@ class OverviewTab extends Component
     public function resetForm(): void
     {
         $this->gender         = $this->person->gender;
-        $this->date_of_birth  = $this->person->date_of_birth?->format('Y-m-d');
+        $this->date_of_birth  = $this->person->date_of_birth
+            ? \Carbon\Carbon::parse($this->person->date_of_birth)->format('Y-m-d')
+            : null;
         $this->dob_year_unknown = $this->person->dob_year_unknown;
-        $this->date_of_death  = $this->person->date_of_death?->format('Y-m-d');
+        $this->date_of_death  = $this->person->date_of_death
+            ? \Carbon\Carbon::parse($this->person->date_of_death)->format('Y-m-d')
+            : null;
         $this->notes          = $this->person->notes;
     }
 
