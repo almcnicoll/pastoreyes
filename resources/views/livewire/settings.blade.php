@@ -155,8 +155,9 @@
     @elseif($activeTab === 'rel_types')
     <div class="max-w-lg">
 
+        {{-- My Custom Types --}}
         <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-semibold text-gray-700">Your Custom Types</h3>
+            <h3 class="text-sm font-semibold text-gray-700">My Custom Types</h3>
             <button wire:click="openAddRelType"
                     class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition-colors">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -187,6 +188,38 @@
             @endforelse
         </div>
 
+        {{-- Global Custom Types (admin only) --}}
+        @if(auth()->user()->is_admin)
+        <div class="mb-6">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-sm font-semibold text-gray-700">
+                    Global Custom Types
+                    <span class="text-xs font-normal text-gray-400 ml-1">(available to all users)</span>
+                </h3>
+            </div>
+            <div class="space-y-2">
+                @forelse($globalCustomRelTypes as $rt)
+                    <div class="flex items-center gap-3 bg-white border border-gray-100 rounded-lg px-4 py-2.5">
+                        <div class="flex-1 text-sm text-gray-700">
+                            {{ $rt->name }}
+                            @if($rt->is_directional && $rt->inverse_name)
+                                <span class="text-gray-400 mx-1">/</span>{{ $rt->inverse_name }}
+                                <span class="text-xs text-gray-400 ml-1">(directional)</span>
+                            @endif
+                        </div>
+                        <button wire:click="editRelType({{ $rt->id }})"
+                                class="text-xs text-indigo-600 hover:underline">Edit</button>
+                        <button wire:click="deleteRelType({{ $rt->id }})"
+                                wire:confirm="Delete this global relationship type?"
+                                class="text-xs text-red-500 hover:underline">Delete</button>
+                    </div>
+                @empty
+                    <p class="text-sm text-gray-400">No global custom types yet.</p>
+                @endforelse
+            </div>
+        </div>
+        @endif
+
         {{-- Add/Edit Form --}}
         @if($showRelTypeForm)
         <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 mb-6">
@@ -212,13 +245,23 @@
                            placeholder="e.g. mentee (inverse of mentor)">
                 </div>
                 @endif
+                @if(auth()->user()->is_admin)
+                <label class="flex items-center gap-2 text-xs text-gray-600">
+                    <input wire:model="relTypeIsGlobal" type="checkbox" class="rounded">
+                    Make global <span class="text-gray-400">(available to all users, not just me)</span>
+                </label>
+                @endif
                 <x-form-actions cancelAction="resetRelTypeForm" />
             </form>
         </div>
         @endif
 
+        {{-- Preset Types (read-only) --}}
         <div>
-            <h3 class="text-sm font-semibold text-gray-700 mb-3">Global Presets <span class="text-gray-400 font-normal text-xs">(read-only)</span></h3>
+            <h3 class="text-sm font-semibold text-gray-700 mb-3">
+                Global Presets
+                <span class="text-xs font-normal text-gray-400 ml-1">(read-only)</span>
+            </h3>
             <div class="space-y-1">
                 @foreach($presetRelTypes as $rt)
                     <div class="text-sm text-gray-500 px-2 py-1">

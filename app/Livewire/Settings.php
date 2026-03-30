@@ -10,8 +10,8 @@ use Livewire\Component;
 class Settings extends Component
 {
     // Account tab
-    public string $firstName = '';
-    public string $lastName = '';
+    public ?string $firstName = '';
+    public ?string $lastName = '';
 
     // Appearance tab
     public array $genderColors = [];
@@ -30,6 +30,7 @@ class Settings extends Component
     public string $relTypeName = '';
     public string $relTypeInverseName = '';
     public bool $relTypeIsDirectional = false;
+    public bool $relTypeIsGlobal = false;
 
     // User management (admin only)
     public ?int $managedUserId = null;
@@ -50,8 +51,8 @@ class Settings extends Component
     {
         $user = auth()->user();
 
-        $this->firstName          = $user->first_name;
-        $this->lastName           = $user->last_name;
+        $this->firstName          = $user->first_name ?? '';
+        $this->lastName           = $user->last_name ?? '';
         $this->genderColors       = config('entry_types.gender_colors');
         $this->significanceColors = config('entry_types.significance');
         $this->entryTypeColors    = collect(config('entry_types.types'))
@@ -135,12 +136,17 @@ class Settings extends Component
     public function editRelType(int $id): void
     {
         $rt = RelationshipType::findOrFail($id);
-        abort_if($rt->user_id !== auth()->id(), 403);
+
+        // Allow admins to edit global types; others can only edit their own
+        if (!$rt->is_preset) {
+            abort_if(!auth()->user()->is_admin && $rt->user_id !== auth()->id(), 403);
+        }
 
         $this->editingRelTypeId     = $id;
         $this->relTypeName          = $rt->name;
         $this->relTypeInverseName   = $rt->inverse_name ?? '';
         $this->relTypeIsDirectional = $rt->is_directional;
+        $this->relTypeIsGlobal      = $rt->user_id === null;
         $this->showRelTypeForm      = true;
     }
 
@@ -151,17 +157,23 @@ class Settings extends Component
             'relTypeInverseName' => 'nullable|string|max:100',
         ]);
 
+        // Only admins can create global types
+        $isGlobal = $this->relTypeIsGlobal && auth()->user()->is_admin;
+
         $data = [
-            'user_id'      => auth()->id(),
-            'name'         => $this->relTypeName,
-            'inverse_name' => $this->relTypeInverseName ?: null,
+            'user_id'        => $isGlobal ? null : auth()->id(),
+            'name'           => $this->relTypeName,
+            'inverse_name'   => $this->relTypeInverseName ?: null,
             'is_directional' => $this->relTypeIsDirectional,
-            'is_preset'    => false,
+            'is_preset'      => false,
         ];
 
         if ($this->editingRelTypeId) {
             $rt = RelationshipType::findOrFail($this->editingRelTypeId);
-            abort_if($rt->user_id !== auth()->id(), 403);
+            abort_if(
+                !auth()->user()->is_admin && $rt->user_id !== auth()->id(),
+                403
+            );
             $rt->update($data);
         } else {
             RelationshipType::create($data);
@@ -174,7 +186,18 @@ class Settings extends Component
     public function deleteRelType(int $id): void
     {
         $rt = RelationshipType::findOrFail($id);
-        abort_if($rt->user_id !== auth()->id(), 403);
+
+        // Presets cannot be deleted by anyone
+        if ($rt->is_preset) {
+            $this->dispatch('notify', message: 'Global preset types cannot be deleted.');
+            return;
+        }
+
+        abort_if(
+            !auth()->user()->is_admin && $rt->user_id !== auth()->id(),
+            403
+        );
+
         $rt->delete();
         $this->dispatch('notify', message: 'Relationship type deleted.');
     }
@@ -186,6 +209,7 @@ class Settings extends Component
         $this->relTypeName          = '';
         $this->relTypeInverseName   = '';
         $this->relTypeIsDirectional = false;
+        $this->relTypeIsGlobal      = false;
     }
 
     // -------------------------------------------------------------------------
@@ -274,7 +298,10 @@ class Settings extends Component
     public function render()
     {
         $customRelTypes = RelationshipType::where('user_id', auth()->id())->get();
-        $presetRelTypes = RelationshipType::whereNull('user_id')->get();
+        $globalCustomRelTypes = auth()->user()->is_admin
+            ? RelationshipType::whereNull('user_id')->where('is_preset', false)->get()
+            : collect();
+        $presetRelTypes = RelationshipType::whereNull('user_id')->where('is_preset', true)->get();
 
         $users = auth()->user()->is_admin && strlen($this->userSearch) >= 2
             ? User::where('id', '!=', auth()->id())
@@ -287,7 +314,7 @@ class Settings extends Component
                 ->values()
             : collect();
 
-        return view('livewire.settings', compact('customRelTypes', 'presetRelTypes', 'users'))
+        return view('livewire.settings', compact('customRelTypes', 'globalCustomRelTypes', 'presetRelTypes', 'users'))
             ->layout('layouts.app', ['title' => 'Settings — PastorEyes']);
     }
 }
