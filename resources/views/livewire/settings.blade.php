@@ -11,6 +11,7 @@
                     'appearance'    => 'Appearance',
                     'rel_types'     => 'Relationship Types',
                     'key_dates'     => 'Key Date Defaults',
+                    'data'          => 'Data',
                 ];
                 if(auth()->user()->is_admin) {
                     $tabs['users'] = 'User Management';
@@ -293,6 +294,10 @@
             Save
         </button>
     </div>
+
+    {{-- Data Tab --}}
+    @elseif($activeTab === 'data')
+    <livewire:data-settings />
 
     {{-- User Management Tab (admin only) --}}
     @elseif($activeTab === 'users' && auth()->user()->is_admin)
