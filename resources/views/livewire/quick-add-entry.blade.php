@@ -39,9 +39,8 @@
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Person</label>
                     <livewire:person-search-select
-                        wire:model="personId"
                         :value="$personId"
-                        :key="'quick-add-person'" />
+                        :key="'quick-add-person-'.($open ? 'open' : 'closed')" />
                 </div>
 
                 {{-- Entry Type --}}

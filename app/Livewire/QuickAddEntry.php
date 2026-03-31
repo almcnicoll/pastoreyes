@@ -24,8 +24,14 @@ class QuickAddEntry extends Component
     public ?string $targetDate = null;
 
     protected $listeners = [
-        'open-quick-add' => 'openModal',
+        'open-quick-add'  => 'openModal',
+        'person-selected' => 'onPersonSelected',
     ];
+
+    public function onPersonSelected(int $personId): void
+    {
+        $this->personId = $personId;
+    }
 
     public function mount(): void
     {

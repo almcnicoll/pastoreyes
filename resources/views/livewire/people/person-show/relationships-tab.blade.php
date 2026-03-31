@@ -53,155 +53,94 @@
         @endforelse
     </div>
 
-    {{-- Add/Edit Form --}}
+    {{-- Add/Edit Relationship Modal --}}
     @if($showForm)
-    <div class="bg-gray-50 border border-gray-200 rounded-xl p-5">
-        <h3 class="text-sm font-semibold text-gray-700 mb-4">
-            {{ $editingRelationshipId ? 'Edit Relationship' : 'Add Relationship' }}
-        </h3>
-        <form wire:submit="saveRelationship" class="space-y-3">
+    <div class="fixed inset-0 z-40 flex items-end sm:items-center justify-center"
+         @keydown.escape.window="$wire.resetForm()">
 
-            <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Related Person</label>
-                <livewire:person-search-select wire:model="relatedPersonId"
-                    :excludeId="$person->id"
-                    :key="'rel-person-search'" />
-            </div>
+        <div class="absolute inset-0 bg-gray-900/50" wire:click="resetForm"></div>
 
-            <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Relationship Type</label>
-                <select wire:model="relationshipTypeId"
-                        class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
-                    <option value="">— Select type —</option>
-                    @foreach($relationshipTypes as $type)
-                        <option value="{{ $type->id }}">
-                            {{ $type->name }}
-                            @if($type->is_directional && $type->inverse_name)
-                                / {{ $type->inverse_name }}
-                            @endif
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+        <div class="relative z-50 w-full sm:max-w-lg bg-white rounded-t-2xl sm:rounded-2xl shadow-xl p-6"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 translate-y-4"
+             x-transition:enter-end="opacity-100 translate-y-0">
 
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">From Date</label>
-                    <input wire:model="dateFrom" type="date"
-                           class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">To Date</label>
-                    <input wire:model="dateTo" type="date"
-                           class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2">
-                </div>
-            </div>
-
-            <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Notes</label>
-                <input wire:model="notes" type="text"
-                       class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2"
-                       placeholder="Optional context...">
-            </div>
-
-            <div class="flex gap-3 pt-1">
-                <button type="submit"
-                        class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors">
-                    Save
-                </button>
-                <button type="button" wire:click="resetForm"
-                        class="px-4 py-2 border border-gray-300 text-gray-600 text-sm rounded-lg hover:bg-gray-50">
-                    Cancel
+            <div class="flex items-center justify-between mb-5">
+                <h3 class="text-base font-semibold text-gray-800">
+                    {{ $editingRelationshipId ? 'Edit Relationship' : 'Add Relationship' }}
+                </h3>
+                <button wire:click="resetForm" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
                 </button>
             </div>
-        </form>
+
+            <form wire:submit="saveRelationship" class="space-y-4">
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Related Person</label>
+                    <livewire:person-search-select
+                        :excludeId="$person->id"
+                        :value="$relatedPersonId"
+                        :key="'rel-person-search-'.$person->id" />
+                    @error('relatedPersonId')
+                        <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Relationship Type</label>
+                    <select wire:model="relationshipTypeId"
+                            class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="">— Select type —</option>
+                        @foreach($relationshipTypes as $type)
+                            <option value="{{ $type->id }}">
+                                {{ $type->name }}
+                                @if($type->is_directional && $type->inverse_name)
+                                    / {{ $type->inverse_name }}
+                                @endif
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">From Date</label>
+                        <input wire:model="dateFrom" type="date"
+                               class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">To Date</label>
+                        <input wire:model="dateTo" type="date"
+                               class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Notes</label>
+                    <input wire:model="notes" type="text"
+                           class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2"
+                           placeholder="Optional context...">
+                </div>
+
+                <div class="flex gap-3 pt-1">
+                    <button type="submit"
+                            class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors">
+                        Save
+                    </button>
+                    <button type="button" wire:click="resetForm"
+                            class="px-4 py-2 border border-gray-300 text-gray-600 text-sm rounded-lg hover:bg-gray-50">
+                        Cancel
+                    </button>
+                </div>
+
+            </form>
+        </div>
     </div>
     @endif
 
 </div>
 
-@push('scripts')
-<script>
-function relationshipGraph(initialData, centralPersonId) {
-    return {
-        cy: null,
 
-        init() {
-            this.cy = cytoscape({
-                container: document.getElementById('cy'),
-                elements: [...initialData.nodes, ...initialData.edges],
-                style: [
-                    {
-                        selector: 'node',
-                        style: {
-                            'background-color': 'data(color)',
-                            'label': 'data(label)',
-                            'color': '#1F2937',
-                            'font-size': '11px',
-                            'text-valign': 'bottom',
-                            'text-margin-y': '4px',
-                            'width': '36px',
-                            'height': '36px',
-                            'border-width': 0,
-                        }
-                    },
-                    {
-                        selector: 'node[?isCentral]',
-                        style: {
-                            'border-width': '3px',
-                            'border-color': '#4F46E5',
-                            'width': '44px',
-                            'height': '44px',
-                        }
-                    },
-                    {
-                        selector: 'edge',
-                        style: {
-                            'width': 2,
-                            'line-color': '#D1D5DB',
-                            'label': 'data(label)',
-                            'font-size': '10px',
-                            'color': '#6B7280',
-                            'text-rotation': 'autorotate',
-                            'text-margin-y': '-8px',
-                            'curve-style': 'bezier',
-                        }
-                    },
-                ],
-                layout: {
-                    name: 'cose',
-                    animate: false,
-                    nodeDimensionsIncludeLabels: true,
-                },
-                userZoomingEnabled: true,
-                userPanningEnabled: true,
-            });
-
-            // Navigate to person profile on node click
-            this.cy.on('tap', 'node', (event) => {
-                const personId = event.target.data('personId');
-                if (personId && personId !== centralPersonId) {
-                    window.location.href = `/people/${personId}`;
-                }
-            });
-
-            // Drag-drop to initiate relationship creation
-            this.cy.on('ehcomplete', (event, sourceNode, targetNode) => {
-                const fromId = sourceNode.data('personId');
-                const toId   = targetNode.data('personId');
-                if (fromId && toId && fromId !== toId) {
-                    @this.call('initiateRelationshipFromGraph', fromId, toId);
-                }
-            });
-        },
-
-        refreshGraph(newData) {
-            if (!this.cy) return;
-            this.cy.elements().remove();
-            this.cy.add([...newData.nodes, ...newData.edges]);
-            this.cy.layout({ name: 'cose', animate: true, nodeDimensionsIncludeLabels: true }).run();
-        },
-    };
-}
-</script>
-@endpush
