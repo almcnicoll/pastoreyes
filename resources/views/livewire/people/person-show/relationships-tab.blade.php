@@ -1,5 +1,5 @@
 <div
-    x-data="relationshipGraph(@js($graphData), @js($person->id))"
+    x-data="relationshipGraph(@js($graphData), @js($person->id), '{{ rtrim(route('people.show', ['person' => '_placeholder_']), '_placeholder_') }}')"
     x-init="init()"
     @graph:refresh.window="refreshGraph($event.detail.graphData)"
 >
@@ -142,5 +142,3 @@
     @endif
 
 </div>
-
-
