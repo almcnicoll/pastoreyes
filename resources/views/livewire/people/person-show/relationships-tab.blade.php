@@ -37,7 +37,9 @@
             <div class="flex items-center gap-3 bg-white border border-gray-100 rounded-lg px-4 py-2.5">
                 <div class="flex-1 min-w-0 flex flex-wrap items-center gap-x-1.5 text-sm">
                     <x-person-name :person="$rel->person" size="sm" />
-                    <span class="text-gray-400 text-xs">{{ $rel->labelForPerson($person->id) }}</span>
+                    <span class="text-gray-400 text-xs">
+                        {{ $rel->labelForPerson($person->id) }}{{ $rel->relationshipType->is_directional ? ' of' : '' }}
+                    </span>
                     <x-person-name :person="$rel->relatedPerson" size="sm" />
                 </div>
                 <div class="flex items-center gap-2 flex-shrink-0">
@@ -100,23 +102,23 @@
                             class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
                         <option value="">— Select type —</option>
                         @foreach($relationshipTypes as $type)
-                            @if($type->is_directional)
-                                {{-- Forward direction: central person is the "from" end --}}
+                            @if($type->is_directional && $type->inverse_name)
+                                {{-- Forward: Poppy is the "from" end (e.g. Poppy is parent) --}}
                                 <option value="{{ $type->id }}" data-inverse="0"
                                     {{ $relationshipTypeId == $type->id && !$isInverse ? 'selected' : '' }}>
-                                    {{ $person->display_name }} → {{ $type->name }}
-                                    @if($type->inverse_name)
-                                        ({{ $type->inverse_name }} of)
-                                    @endif
+                                    {{ $type->name }}-{{ $type->inverse_name }} ({{ $person->display_name }} is {{ $type->name }} of n)
                                 </option>
-                                {{-- Inverse direction: central person is the "to" end --}}
-                                @if($type->inverse_name)
+                                {{-- Inverse: Poppy is the "to" end (e.g. Poppy is child) --}}
                                 <option value="{{ $type->id }}" data-inverse="1"
                                     {{ $relationshipTypeId == $type->id && $isInverse ? 'selected' : '' }}>
-                                    {{ $person->display_name }} ← {{ $type->inverse_name }}
-                                    ({{ $type->name }} of)
+                                    {{ $type->inverse_name }}-{{ $type->name }} ({{ $person->display_name }} is {{ $type->inverse_name }} of n)
                                 </option>
-                                @endif
+                            @elseif($type->is_directional)
+                                {{-- Directional but no inverse name defined --}}
+                                <option value="{{ $type->id }}" data-inverse="0"
+                                    {{ $relationshipTypeId == $type->id ? 'selected' : '' }}>
+                                    {{ $type->name }} ({{ $person->display_name }} is {{ $type->name }})
+                                </option>
                             @else
                                 <option value="{{ $type->id }}"
                                     {{ $relationshipTypeId == $type->id ? 'selected' : '' }}>
@@ -125,12 +127,9 @@
                             @endif
                         @endforeach
                     </select>
-                    <p class="text-xs text-gray-400 mt-1">
-                        → means {{ $person->display_name }} holds that role
-                    </p>
                 </div>
 
-                {{-- Hidden field to track direction for directional types --}}
+                {{-- Track direction for directional types via data-inverse attribute --}}
                 <div x-data
                      x-init="
                         $el.closest('form').querySelector('select').addEventListener('change', function(e) {
@@ -177,5 +176,3 @@
     @endif
 
 </div>
-
-
