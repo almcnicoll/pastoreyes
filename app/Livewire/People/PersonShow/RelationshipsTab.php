@@ -11,12 +11,14 @@ class RelationshipsTab extends Component
 {
     public Person $person;
     public int $depth = 2;
+    public int $graphCentralPersonId; // can differ from $person->id when re-centred
 
     // Add/edit relationship form
     public bool $showForm = false;
     public ?int $editingRelationshipId = null;
     public ?int $relatedPersonId = null;
     public ?int $relationshipTypeId = null;
+    public bool $isInverse = false; // true = central person is the "to" end
     public string $notes = '';
     public ?string $dateFrom = null;
     public ?string $dateTo = null;
@@ -37,7 +39,8 @@ class RelationshipsTab extends Component
 
     public function mount(Person $person): void
     {
-        $this->person = $person;
+        $this->person               = $person;
+        $this->graphCentralPersonId = $person->id;
     }
 
     public function updatedDepth(): void
@@ -48,20 +51,33 @@ class RelationshipsTab extends Component
     }
 
     /**
+     * Re-centre the graph on a different person node without changing the profile view.
+     */
+    public function recenterGraph(int $personId): void
+    {
+        $person = Person::where('user_id', auth()->id())->find($personId);
+        if (!$person) return;
+
+        $this->graphCentralPersonId = $personId;
+        $this->dispatch('graph:refresh', graphData: $this->buildGraphData());
+    }
+
+    /**
      * Build Cytoscape-compatible node/edge data for the graph.
      * Traverses relationships up to $depth levels from the central person.
      */
     public function buildGraphData(): array
     {
-        $userId     = auth()->id();
-        $visited    = collect();
-        $nodes      = collect();
-        $edges      = collect();
-        $queue      = collect([['id' => $this->person->id, 'level' => 0]]);
+        $userId       = auth()->id();
+        $centralId    = $this->graphCentralPersonId;
+        $visited      = collect();
+        $nodes        = collect();
+        $edges        = collect();
+        $queue        = collect([['id' => $centralId, 'level' => 0]]);
         $genderColors = config('entry_types.gender_colors');
 
         while ($queue->isNotEmpty()) {
-            $current = $queue->shift();
+            $current  = $queue->shift();
             $personId = $current['id'];
             $level    = $current['level'];
 
@@ -80,7 +96,8 @@ class RelationshipsTab extends Component
                     'id'        => 'p' . $p->id,
                     'label'     => $p->display_name,
                     'personId'  => $p->id,
-                    'isCentral' => $p->id === $this->person->id,
+                    'isCentral' => $p->id === $centralId,
+                    'isProfile' => $p->id === $this->person->id,
                     'color'     => $genderColors[$p->gender ?? 'unknown'] ?? $genderColors['unknown'],
                 ],
             ]);
@@ -97,7 +114,6 @@ class RelationshipsTab extends Component
                         ? $rel->related_person_id
                         : $rel->person_id;
 
-                    // Add edge (avoid duplicates)
                     $edgeId = 'e' . min($personId, $otherId) . '_' . max($personId, $otherId) . '_' . $rel->id;
                     if (!$edges->contains('data.id', $edgeId)) {
                         $edges->push([
@@ -105,8 +121,7 @@ class RelationshipsTab extends Component
                                 'id'     => $edgeId,
                                 'source' => 'p' . $rel->person_id,
                                 'target' => 'p' . $rel->related_person_id,
-                                // Label from the perspective of the central person
-                                'label'  => $rel->labelForPerson($this->person->id),
+                                'label'  => $rel->labelForPerson($centralId),
                                 'relId'  => $rel->id,
                             ],
                         ]);
@@ -120,8 +135,9 @@ class RelationshipsTab extends Component
         }
 
         return [
-            'nodes' => $nodes->values()->toArray(),
-            'edges' => $edges->values()->toArray(),
+            'nodes'           => $nodes->values()->toArray(),
+            'edges'           => $edges->values()->toArray(),
+            'centralPersonId' => $centralId,
         ];
     }
 
@@ -134,6 +150,21 @@ class RelationshipsTab extends Component
         $this->editingRelationshipId = null;
     }
 
+    public function reverseRelationship(int $relationshipId): void
+    {
+        $rel = Relationship::findOrFail($relationshipId);
+        abort_if($rel->user_id !== auth()->id(), 403);
+
+        // Swap person_id and related_person_id
+        $rel->update([
+            'person_id'         => $rel->related_person_id,
+            'related_person_id' => $rel->person_id,
+        ]);
+
+        $this->dispatch('graph:refresh', graphData: $this->buildGraphData());
+        $this->dispatch('notify', message: 'Relationship direction reversed.');
+    }
+
     public function editRelationship(int $relationshipId): void
     {
         $rel = Relationship::findOrFail($relationshipId);
@@ -144,6 +175,7 @@ class RelationshipsTab extends Component
             ? $rel->related_person_id
             : $rel->person_id;
         $this->relationshipTypeId    = $rel->relationship_type_id;
+        $this->isInverse             = $rel->related_person_id === $this->person->id;
         $this->notes                 = $rel->notes ?? '';
         $this->dateFrom              = $rel->date_from;
         $this->dateTo                = $rel->date_to;
@@ -153,17 +185,21 @@ class RelationshipsTab extends Component
     public function saveRelationship(): void
     {
         $this->validate([
-            'relatedPersonId'   => 'required|integer|exists:persons,id',
+            'relatedPersonId'    => 'required|integer|exists:persons,id',
             'relationshipTypeId' => 'required|integer|exists:relationship_types,id',
-            'notes'             => 'nullable|string|max:1000',
-            'dateFrom'          => 'nullable|date',
-            'dateTo'            => 'nullable|date|after_or_equal:dateFrom',
+            'notes'              => 'nullable|string|max:1000',
+            'dateFrom'           => 'nullable|date',
+            'dateTo'             => 'nullable|date|after_or_equal:dateFrom',
         ]);
+
+        // isInverse = true means the related person is the "from" end
+        $fromId = $this->isInverse ? $this->relatedPersonId : $this->person->id;
+        $toId   = $this->isInverse ? $this->person->id      : $this->relatedPersonId;
 
         $data = [
             'user_id'              => auth()->id(),
-            'person_id'            => $this->person->id,
-            'related_person_id'    => $this->relatedPersonId,
+            'person_id'            => $fromId,
+            'related_person_id'    => $toId,
             'relationship_type_id' => $this->relationshipTypeId,
             'notes'                => $this->notes ?: null,
             'date_from'            => $this->dateFrom,
@@ -199,6 +235,7 @@ class RelationshipsTab extends Component
         $this->editingRelationshipId = null;
         $this->relatedPersonId       = null;
         $this->relationshipTypeId    = null;
+        $this->isInverse             = false;
         $this->notes                 = '';
         $this->dateFrom              = null;
         $this->dateTo                = null;

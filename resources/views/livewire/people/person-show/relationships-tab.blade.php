@@ -41,6 +41,11 @@
                     <x-person-name :person="$rel->relatedPerson" size="sm" />
                 </div>
                 <div class="flex items-center gap-2 flex-shrink-0">
+                    @if($rel->relationshipType->is_directional)
+                        <button wire:click="reverseRelationship({{ $rel->id }})"
+                                wire:confirm="Reverse the direction of this relationship?"
+                                class="text-xs text-amber-600 hover:underline">Reverse</button>
+                    @endif
                     <button wire:click="editRelationship({{ $rel->id }})"
                             class="text-xs text-indigo-600 hover:underline">Edit</button>
                     <button wire:click="deleteRelationship({{ $rel->id }})"
@@ -95,15 +100,45 @@
                             class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
                         <option value="">— Select type —</option>
                         @foreach($relationshipTypes as $type)
-                            <option value="{{ $type->id }}">
-                                {{ $type->name }}
-                                @if($type->is_directional && $type->inverse_name)
-                                    / {{ $type->inverse_name }}
+                            @if($type->is_directional)
+                                {{-- Forward direction: central person is the "from" end --}}
+                                <option value="{{ $type->id }}" data-inverse="0"
+                                    {{ $relationshipTypeId == $type->id && !$isInverse ? 'selected' : '' }}>
+                                    {{ $person->display_name }} → {{ $type->name }}
+                                    @if($type->inverse_name)
+                                        ({{ $type->inverse_name }} of)
+                                    @endif
+                                </option>
+                                {{-- Inverse direction: central person is the "to" end --}}
+                                @if($type->inverse_name)
+                                <option value="{{ $type->id }}" data-inverse="1"
+                                    {{ $relationshipTypeId == $type->id && $isInverse ? 'selected' : '' }}>
+                                    {{ $person->display_name }} ← {{ $type->inverse_name }}
+                                    ({{ $type->name }} of)
+                                </option>
                                 @endif
-                            </option>
+                            @else
+                                <option value="{{ $type->id }}"
+                                    {{ $relationshipTypeId == $type->id ? 'selected' : '' }}>
+                                    {{ $type->name }}
+                                </option>
+                            @endif
                         @endforeach
                     </select>
+                    <p class="text-xs text-gray-400 mt-1">
+                        → means {{ $person->display_name }} holds that role
+                    </p>
                 </div>
+
+                {{-- Hidden field to track direction for directional types --}}
+                <div x-data
+                     x-init="
+                        $el.closest('form').querySelector('select').addEventListener('change', function(e) {
+                            const selected = e.target.options[e.target.selectedIndex];
+                            const isInverse = selected.dataset.inverse === '1';
+                            $wire.set('isInverse', isInverse);
+                        });
+                     "></div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
@@ -142,3 +177,5 @@
     @endif
 
 </div>
+
+
