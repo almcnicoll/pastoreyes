@@ -34,13 +34,22 @@
     {{-- Relationship List --}}
     <div class="space-y-2 mb-4">
         @forelse($relationships as $rel)
+            @php
+                $otherPerson = $rel->otherPerson($person->id);
+                $isFromEnd   = $rel->person_id === $person->id;
+                // For display we want: [other] [their role relative to central] of [central]
+                // "their role relative to central" is the inverse of central's role
+                $label = $rel->relationshipType->is_directional
+                    ? $rel->relationshipType->labelFromPerspective(!$isFromEnd)
+                    : $rel->relationshipType->name;
+            @endphp
             <div class="flex items-center gap-3 bg-white border border-gray-100 rounded-lg px-4 py-2.5">
                 <div class="flex-1 min-w-0 flex flex-wrap items-center gap-x-1.5 text-sm">
-                    <x-person-name :person="$rel->person" size="sm" />
+                    <x-person-name :person="$otherPerson" size="sm" />
                     <span class="text-gray-400 text-xs">
-                        {{ $rel->labelForPerson($person->id) }}{{ $rel->relationshipType->is_directional ? ' of' : '' }}
+                        {{ $label }}{{ $rel->relationshipType->is_directional ? ' of' : '' }}
                     </span>
-                    <x-person-name :person="$rel->relatedPerson" size="sm" />
+                    <x-person-name :person="$person" size="sm" />
                 </div>
                 <div class="flex items-center gap-2 flex-shrink-0">
                     @if($rel->relationshipType->is_directional)

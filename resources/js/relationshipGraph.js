@@ -10,6 +10,9 @@ export default function relationshipGraph(
         clickDelay: 250, // ms to wait before deciding single vs double click
 
         init() {
+            // Capture $wire here while it is available as an Alpine magic property
+            const wire = this.$wire;
+
             this.$nextTick(() => {
                 this.cy = window.cytoscape({
                     container: document.getElementById("cy"),
@@ -88,7 +91,7 @@ export default function relationshipGraph(
                             this.clickTimer = null;
                             if (personId !== this.currentCentralId) {
                                 this.currentCentralId = personId;
-                                $wire.recenterGraph(personId);
+                                wire.recenterGraph(personId);
                             }
                         }, this.clickDelay);
                     }
