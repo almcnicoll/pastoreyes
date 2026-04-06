@@ -31,7 +31,7 @@ class GoogleContactsService
                 'readMask'   => 'names,emailAddresses,phoneNumbers',
                 'pageSize'   => 10,
             ]);
-        \Log::debug('Google contacts raw response', ['body' => $response]);
+        //\Log::debug('Google contacts raw response', ['body' => $response]);
 
         if (!$response->successful()) {
             return collect();
