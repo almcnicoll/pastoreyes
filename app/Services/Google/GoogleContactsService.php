@@ -28,9 +28,10 @@ class GoogleContactsService
         $response = $this->client->http()
             ->get(self::BASE_URL . '/people:searchContacts', [
                 'query'      => $query,
-                'readMask'   => 'names,emailAddresses,phoneNumbers,photos,resourceName',
+                'readMask'   => 'names,emailAddresses,phoneNumbers',
                 'pageSize'   => 10,
             ]);
+        \Log::debug('Google contacts raw response', ['body' => $response]);
 
         if (!$response->successful()) {
             return collect();
