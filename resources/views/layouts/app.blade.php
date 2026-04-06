@@ -29,6 +29,9 @@
                 <x-nav-link :href="route('timeline')" :active="request()->routeIs('timeline')">
                     Timeline
                 </x-nav-link>
+                <x-nav-link :href="route('tasks')" :active="request()->routeIs('tasks')">
+                    Tasks
+                </x-nav-link>
                 <x-nav-link :href="route('settings')" :active="request()->routeIs('settings')">
                     Settings
                 </x-nav-link>
@@ -88,6 +91,9 @@
                 </x-nav-link>
                 <x-nav-link :href="route('timeline')" :active="request()->routeIs('timeline')" mobile>
                     Timeline
+                </x-nav-link>
+                <x-nav-link :href="route('tasks')" :active="request()->routeIs('tasks')" mobile>
+                    Tasks
                 </x-nav-link>
                 <x-nav-link :href="route('settings')" :active="request()->routeIs('settings')" mobile>
                     Settings

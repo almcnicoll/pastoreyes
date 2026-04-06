@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Goal;
 use App\Models\KeyDate;
 use App\Models\PrayerNeed;
+use App\Models\Task;
 use App\Models\TimelineEntry;
 use Illuminate\Support\Collection;
 use Livewire\Component;
@@ -95,14 +96,28 @@ class Dashboard extends Component
             ->values();
     }
 
+    /**
+     * Upcoming incomplete tasks due within the window, plus overdue tasks.
+     */
+    public function getUpcomingTasksProperty(): Collection
+    {
+        return Task::where('user_id', auth()->id())
+            ->incomplete()
+            ->where('due_date', '<=', now()->addDays($this->upcomingDaysWindow))
+            ->with('persons.primaryName')
+            ->orderBy('due_date')
+            ->get();
+    }
+
     public function render()
     {
         return view('livewire.dashboard', [
-            'upcomingKeyDates'     => $this->upcoming_key_dates,
+            'upcomingKeyDates'      => $this->upcoming_key_dates,
             'unresolvedPrayerNeeds' => $this->unresolved_prayer_needs,
-            'approachingGoals'     => $this->approaching_goals,
-            'recentActivity'       => $this->recent_activity,
-            'highSignificance'     => $this->high_significance,
+            'approachingGoals'      => $this->approaching_goals,
+            'recentActivity'        => $this->recent_activity,
+            'highSignificance'      => $this->high_significance,
+            'upcomingTasks'         => $this->upcoming_tasks,
         ])->layout('layouts.app', ['title' => 'Dashboard — PastorEyes']);
     }
 }

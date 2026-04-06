@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Livewire\Dashboard;
 use App\Livewire\People\PeopleIndex;
 use App\Livewire\People\PersonShow;
+use App\Livewire\Tasks;
 use App\Livewire\Timeline;
 use App\Livewire\Settings;
 use Illuminate\Support\Facades\Route;
@@ -56,6 +57,8 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/people/{person}', PersonShow::class)->name('people.show');
 
     Route::get('/timeline', Timeline::class)->name('timeline');
+
+    Route::get('/tasks', Tasks::class)->name('tasks');
 
     Route::get('/settings', Settings::class)->name('settings');
 

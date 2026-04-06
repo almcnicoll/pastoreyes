@@ -76,6 +76,51 @@
             @endif
         </div>
 
+        {{-- Upcoming Tasks --}}
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+            <h2 class="text-base font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                </svg>
+                Upcoming Tasks
+                <span class="ml-auto text-xs text-gray-400 font-normal">Next {{ $upcomingDaysWindow }} days</span>
+            </h2>
+
+            @forelse($upcomingTasks as $task)
+                <div class="flex items-start gap-3 py-2 border-b border-gray-50 last:border-0">
+                    <span class="{{ $task->due_date->isPast() ? 'text-red-500' : 'text-gray-400' }} text-xs whitespace-nowrap mt-0.5">
+                        @if($task->due_date->isToday())
+                            Today
+                        @elseif($task->due_date->isPast())
+                            Overdue
+                        @else
+                            {{ $task->due_date->format('j M') }}
+                        @endif
+                    </span>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm text-gray-700 truncate">{{ $task->title }}</p>
+                        @if($task->persons->isNotEmpty())
+                            <div class="flex flex-wrap gap-x-1 mt-0.5">
+                                @foreach($task->persons as $person)
+                                    <x-person-name :person="$person" size="sm" />
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            @empty
+                <p class="text-sm text-gray-400 py-2">No tasks due in the next {{ $upcomingDaysWindow }} days.</p>
+            @endforelse
+
+            @if($upcomingTasks->isNotEmpty())
+                <a href="{{ route('tasks') }}"
+                   class="mt-3 block text-xs text-indigo-600 hover:underline">
+                    View all tasks →
+                </a>
+            @endif
+        </div>
+
         {{-- Approaching Goal Targets --}}
         <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
             <h2 class="text-base font-semibold text-gray-700 mb-4 flex items-center gap-2">
