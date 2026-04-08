@@ -3,12 +3,14 @@
 namespace App\Livewire\People\PersonShow;
 
 use App\Actions\SyncKeyDateToCalendar;
+use App\Livewire\Concerns\CatchesDbErrors;
 use App\Models\KeyDate;
 use App\Models\Person;
 use Livewire\Component;
 
 class KeyDatesTab extends Component
 {
+    use CatchesDbErrors;
     public Person $person;
 
     public bool $showForm = false;

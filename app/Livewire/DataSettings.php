@@ -4,12 +4,14 @@ namespace App\Livewire;
 
 use App\Actions\ExportUserData;
 use App\Actions\ImportUserData;
+use App\Livewire\Concerns\CatchesDbErrors;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DataSettings extends Component
 {
+    use CatchesDbErrors;
     use WithFileUploads;
 
     // Export

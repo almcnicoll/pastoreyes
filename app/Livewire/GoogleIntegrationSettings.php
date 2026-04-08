@@ -2,11 +2,13 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Concerns\CatchesDbErrors;
 use App\Services\Google\GoogleCalendarService;
 use Livewire\Component;
 
 class GoogleIntegrationSettings extends Component
 {
+    use CatchesDbErrors;
     public bool $loadingCalendars = false;
     public bool $calendarsError = false;
     public array $calendars = [];

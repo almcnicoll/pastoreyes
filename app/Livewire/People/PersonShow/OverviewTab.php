@@ -2,12 +2,14 @@
 
 namespace App\Livewire\People\PersonShow;
 
+use App\Livewire\Concerns\CatchesDbErrors;
 use App\Models\Person;
 use App\Models\PersonName;
 use Livewire\Component;
 
 class OverviewTab extends Component
 {
+    use CatchesDbErrors;
     public Person $person;
     public bool $editing = false;
 

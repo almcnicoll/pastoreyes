@@ -2,6 +2,7 @@
 
 namespace App\Livewire\People\PersonShow;
 
+use App\Livewire\Concerns\CatchesDbErrors;
 use App\Models\Goal;
 use App\Models\Outcome;
 use App\Models\Person;
@@ -10,6 +11,7 @@ use Livewire\Component;
 
 class GoalsPrayerTab extends Component
 {
+    use CatchesDbErrors;
     public Person $person;
 
     // Shared form state

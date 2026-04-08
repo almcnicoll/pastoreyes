@@ -152,6 +152,55 @@
         <span x-text="message"></span>
     </div>
 
+    {{-- DB Error Toast --}}
+    <div
+        x-data="{ show: false, detail: '', showModal: false }"
+        x-on:db-save-error.window="detail = $event.detail.detail; show = true"
+        x-show="show"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 translate-y-2"
+        x-transition:enter-end="opacity-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="opacity-100 translate-y-0"
+        x-transition:leave-end="opacity-0 translate-y-2"
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-red-700 text-white text-sm px-4 py-2.5 rounded-lg shadow-lg"
+        style="display: none;">
+        <span>Database save failed.</span>
+        <button
+            type="button"
+            x-on:click="showModal = true"
+            class="underline underline-offset-2 whitespace-nowrap hover:text-red-200 focus:outline-none">
+            More info
+        </button>
+        <button
+            type="button"
+            x-on:click="show = false"
+            class="ml-1 text-red-200 hover:text-white focus:outline-none"
+            aria-label="Dismiss">
+            &times;
+        </button>
+
+        {{-- "More info" modal --}}
+        <div
+            x-show="showModal"
+            x-on:click.self="showModal = false"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            style="display: none;">
+            <div class="bg-white text-gray-900 rounded-lg shadow-xl max-w-lg w-full mx-4 p-6">
+                <h2 class="text-base font-semibold mb-3">Database error detail</h2>
+                <pre x-text="detail" class="text-xs bg-gray-100 rounded p-3 overflow-auto max-h-64 whitespace-pre-wrap break-all"></pre>
+                <div class="mt-4 flex justify-end">
+                    <button
+                        type="button"
+                        x-on:click="showModal = false"
+                        class="px-4 py-1.5 text-sm bg-gray-800 text-white rounded hover:bg-gray-700">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @livewireScriptConfig
     @stack('scripts')
 </body>

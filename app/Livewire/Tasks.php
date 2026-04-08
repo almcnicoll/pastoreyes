@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Concerns\CatchesDbErrors;
 use App\Models\Person;
 use App\Models\Task;
 use Illuminate\Support\Collection;
@@ -9,6 +10,7 @@ use Livewire\Component;
 
 class Tasks extends Component
 {
+    use CatchesDbErrors;
     // Filters
     public string $filter = 'incomplete'; // incomplete, complete, all
     public string $sortDirection = 'asc'; // soonest first by default

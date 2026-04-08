@@ -3,12 +3,14 @@
 namespace App\Livewire\People;
 
 use App\Actions\ImportPersonFromGoogle;
+use App\Livewire\Concerns\CatchesDbErrors;
 use App\Services\Google\GoogleContactsService;
 use Illuminate\Support\Collection;
 use Livewire\Component;
 
 class AddPersonFromGoogle extends Component
 {
+    use CatchesDbErrors;
     public bool $open = false;
     public string $search = '';
     public Collection $results;

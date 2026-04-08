@@ -2,6 +2,7 @@
 
 namespace App\Livewire\People;
 
+use App\Livewire\Concerns\CatchesDbErrors;
 use App\Models\Person;
 use App\Models\PersonName;
 use Illuminate\Support\Facades\DB;
@@ -10,6 +11,7 @@ use Livewire\WithFileUploads;
 
 class AddPerson extends Component
 {
+    use CatchesDbErrors;
     public bool $open = false;
 
     // Name fields

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\People\PersonShow;
 
+use App\Livewire\Concerns\CatchesDbErrors;
 use App\Models\Person;
 use App\Models\Relationship;
 use App\Models\RelationshipType;
@@ -9,6 +10,7 @@ use Livewire\Component;
 
 class RelationshipsTab extends Component
 {
+    use CatchesDbErrors;
     public Person $person;
     public int $depth = 2;
     public int $graphCentralPersonId; // can differ from $person->id when re-centred

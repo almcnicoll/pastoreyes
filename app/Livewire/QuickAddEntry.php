@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Concerns\CatchesDbErrors;
 use App\Models\Goal;
 use App\Models\KeyDate;
 use App\Models\Note;
@@ -10,6 +11,7 @@ use Livewire\Component;
 
 class QuickAddEntry extends Component
 {
+    use CatchesDbErrors;
     public bool $open = false;
     public string $type = '';
     public ?int $personId = null;

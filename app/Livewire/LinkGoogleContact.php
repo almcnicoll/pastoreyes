@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Concerns\CatchesDbErrors;
 use App\Models\Person;
 use App\Services\Google\GoogleContactsService;
 use Illuminate\Support\Collection;
@@ -9,6 +10,7 @@ use Livewire\Component;
 
 class LinkGoogleContact extends Component
 {
+    use CatchesDbErrors;
     public bool $open = false;
     public ?int $personId = null;
     public string $search = '';

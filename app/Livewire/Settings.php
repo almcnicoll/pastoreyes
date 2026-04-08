@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Concerns\CatchesDbErrors;
 use App\Models\RelationshipType;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -9,6 +10,7 @@ use Livewire\Component;
 
 class Settings extends Component
 {
+    use CatchesDbErrors;
     // Account tab
     public ?string $firstName = '';
     public ?string $lastName = '';
