@@ -28,7 +28,11 @@ class Dashboard extends Component
         return KeyDate::where('user_id', auth()->id())
             ->with(['persons.primaryName'])
             ->get()
-            ->filter(fn($kd) => $kd->days_until !== null && $kd->days_until <= $this->upcomingDaysWindow)
+            ->filter(
+                fn($kd) => $kd->days_until !== null && 
+                $kd->days_until >= -1 &&
+                $kd->days_until <= $this->upcomingDaysWindow
+            )
             ->sortBy('days_until')
             ->values();
     }
