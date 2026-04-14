@@ -3,7 +3,9 @@
     @unless($personId)
     <div class="flex items-center justify-between mb-6">
         <h1 class="text-2xl font-bold text-gray-800">Timeline</h1>
-        <livewire:quick-add-entry />
+        <livewire:quick-add-entry 
+            wire:key="quick-add-entry-timeline"
+        />
     </div>
     @endunless
 
@@ -73,7 +75,7 @@
     {{-- Quick Add (when embedded in person profile) --}}
     @if($personId)
     <div class="mb-4">
-        <livewire:quick-add-entry :personId="$personId" />
+        <livewire:quick-add-entry :personId="$personId" wire:key="quick-add-entry-timeline" />
     </div>
     @endif
 
@@ -157,6 +159,19 @@
                 @endif
             </div>
         @endforelse
+    </div>
+
+    {{-- Mobile FAB --}}
+    <div class="fixed bottom-6 right-6 md:hidden">
+        <button
+            x-data
+            @click="Livewire.dispatch('open-quick-add', { personId: {{ $personId ?? 'null' }} })"
+            class="w-14 h-14 rounded-full bg-indigo-600 text-white shadow-lg flex items-center justify-center hover:bg-indigo-700 transition-colors"
+        >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+        </button>
     </div>
 
 </div>
