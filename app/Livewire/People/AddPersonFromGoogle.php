@@ -178,6 +178,31 @@ class AddPersonFromGoogle extends Component
         }
     }
 
+    public function importAndAddAnother(): void
+    {
+        if (!$this->selectedResourceName) {
+            return;
+        }
+
+        $this->importing = true;
+
+        try {
+            (new ImportPersonFromGoogle())->execute($this->selectedResourceName);
+            $this->dispatch('notify', message: 'Contact imported. Search for another.');
+
+            // Reset back to search screen without closing the modal
+            $this->preview              = null;
+            $this->selectedResourceName = null;
+            $this->search               = '';
+            $this->results              = collect();
+        } catch (\Exception $e) {
+            $this->error = true;
+            $this->dispatch('notify', message: 'Import failed: ' . $e->getMessage());
+        }
+
+        $this->importing = false;
+    }
+
     public function back(): void
     {
         $this->preview              = null;

@@ -171,6 +171,16 @@
                         <span wire:loading.remove wire:target="import">Import Contact</span>
                         <span wire:loading wire:target="import">Importing...</span>
                     </button>
+                    <button wire:click="importAndAddAnother"
+                            wire:loading.attr="disabled"
+                            class="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 text-sm font-medium rounded-lg hover:bg-indigo-100 transition-colors disabled:opacity-60">
+                        <svg wire:loading wire:target="importAndAddAnother" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                        </svg>
+                        <span wire:loading.remove wire:target="importAndAddAnother">Import + Add Another</span>
+                        <span wire:loading wire:target="importAndAddAnother">Importing...</span>
+                    </button>
                     <button wire:click="back"
                             class="px-4 py-2 border border-gray-300 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors">
                         Back
