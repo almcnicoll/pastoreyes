@@ -267,14 +267,18 @@ class Timeline extends Component
             return;
         }
 
+        $search          = strtolower($this->editPersonSearch);
+        $alreadySelected = $this->editSelectedPersonIds;
+
         $this->editPersonResults = Person::where('user_id', auth()->id())
-            ->whereHas('names', function ($q) {
-                $q->where('first_name', 'like', '%' . $this->editPersonSearch . '%')
-                  ->orWhere('last_name', 'like', '%' . $this->editPersonSearch . '%');
-            })
-            ->whereNotIn('id', $this->editSelectedPersonIds)
-            ->limit(5)
-            ->get();
+            ->with('primaryName')
+            ->get()
+            ->filter(fn($p) =>
+                str_contains(strtolower($p->display_name), $search) &&
+                !in_array($p->id, $alreadySelected)
+            )
+            ->take(8)
+            ->values();
     }
 
     public function addEditPerson(int $personId): void
