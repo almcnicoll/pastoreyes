@@ -164,8 +164,7 @@
     {{-- Mobile FAB --}}
     <div class="fixed bottom-6 right-6 md:hidden">
         <button
-            x-data
-            @click="Livewire.dispatch('open-quick-add', { personId: {{ $personId ?? 'null' }} })"
+            wire:click="$dispatch('open-quick-add', { personId: {{ $personId ?? 'null' }} })"
             class="w-14 h-14 rounded-full bg-indigo-600 text-white shadow-lg flex items-center justify-center hover:bg-indigo-700 transition-colors"
         >
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
