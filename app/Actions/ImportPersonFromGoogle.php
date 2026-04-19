@@ -6,6 +6,7 @@ use App\Models\Address;
 use App\Models\KeyDate;
 use App\Models\Person;
 use App\Models\PersonName;
+use App\Models\PersonPhoto;
 use App\Services\Google\GoogleContactsService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -45,6 +46,11 @@ class ImportPersonFromGoogle
             $this->importNames($person, $contact);
 
             // ----------------------------------------------------------------
+            // Import photo
+            // ----------------------------------------------------------------
+            $this->importPhoto($person, $contact);
+
+            // ----------------------------------------------------------------
             // Import addresses
             // ----------------------------------------------------------------
             $this->importAddresses($person, $contact);
@@ -77,6 +83,17 @@ class ImportPersonFromGoogle
      * Create PersonName records from Google contact name data.
      * Google may provide multiple names (e.g. maiden name via nickname field).
      */
+    /**
+     * Returns true if a string looks like auto-generated initials —
+     * i.e. consists only of single letters optionally separated by dots and/or spaces.
+     * Examples that match: "A.M.", "A M", "A. M.", "AM", "A.B.C."
+     * Examples that don't match: "Al", "Amy", "A.J. Smith"
+     */
+    protected function looksLikeInitials(string $value): bool
+    {
+        return (bool) preg_match('/^[A-Za-z]([.\s][A-Za-z])*\.?$/', trim($value));
+    }
+
     protected function importNames(Person $person, array $contact): void
     {
         $isPrimary = true;
@@ -98,6 +115,11 @@ class ImportPersonFromGoogle
         $nicknames = $contact['rawData']['nicknames'] ?? [];
         if (!$nickname && !empty($nicknames)) {
             $nickname = $nicknames[0]['value'] ?? null;
+        }
+
+        // Discard auto-generated initials (e.g. "A.M.", "A M") — not real preferred names
+        if ($nickname && $this->looksLikeInitials($nickname)) {
+            $nickname = null;
         }
 
         if ($firstName || $lastName) {
@@ -137,6 +159,46 @@ class ImportPersonFromGoogle
     /**
      * Import addresses from Google contact.
      */
+    /**
+     * Fetch the photo from Google and store as encrypted base64 in PersonPhoto.
+     */
+    protected function importPhoto(Person $person, array $contact): void
+    {
+        $photoUrl = $contact['photoUrl'] ?? null;
+
+        if (!$photoUrl) {
+            return;
+        }
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::timeout(10)->get($photoUrl);
+
+            if (!$response->successful()) {
+                return;
+            }
+
+            $bytes    = $response->body();
+            $mimeType = explode(';', $response->header('Content-Type') ?? 'image/jpeg')[0];
+            $fileSize = strlen($bytes);
+
+            if ($fileSize > 10 * 1024 * 1024) {
+                return; // Enforce 10MB cap
+            }
+
+            PersonPhoto::create([
+                'person_id' => $person->id,
+                'data'      => base64_encode($bytes),
+                'mime_type' => $mimeType,
+                'file_size' => $fileSize,
+            ]);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning(
+                'Failed to import Google photo for person ' . $person->id . ': ' . $e->getMessage()
+            );
+        }
+    }
+
     protected function importAddresses(Person $person, array $contact): void
     {
         $addresses = $contact['rawData']['addresses'] ?? [];

@@ -8,41 +8,141 @@
     </div>
 
     @if($editing)
-    {{-- Edit Form --}}
-    <form wire:submit="save" class="space-y-4">
+    {{-- ================================================================
+         EDIT FORM — combined person, primary name, and photo
+         ================================================================ --}}
+    <form wire:submit="save" class="space-y-5">
 
+        {{-- Photo --}}
         <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Gender</label>
-            <select wire:model="gender"
-                    class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
-                <option value="">— Unknown —</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="unknown">Other / Unknown</option>
-            </select>
+            <label class="block text-xs font-medium text-gray-600 mb-2">Photo</label>
+            <div class="flex items-center gap-4">
+
+                {{-- Current photo preview --}}
+                <div class="w-16 h-16 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center flex-shrink-0">
+                    @if($photoUpload)
+                        <img src="{{ $photoUpload->temporaryUrl() }}"
+                             alt="Preview" class="w-full h-full object-cover">
+                    @elseif($person->photo && !$removePhoto)
+                        <img src="{{ $person->photo->data_uri }}"
+                             alt="{{ $person->display_name }}" class="w-full h-full object-cover">
+                    @else
+                        <span class="text-xl font-bold text-gray-400">
+                            {{ strtoupper(substr($person->display_name, 0, 1)) }}
+                        </span>
+                    @endif
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                        </svg>
+                        {{ $person->photo ? 'Replace photo' : 'Upload photo' }}
+                        <input wire:model="photoUpload" type="file" accept="image/*" class="hidden">
+                    </label>
+
+                    @if($person->photo && !$removePhoto)
+                        <label class="flex items-center gap-1.5 text-xs text-red-500 cursor-pointer">
+                            <input wire:model="removePhoto" type="checkbox" class="rounded">
+                            Remove photo
+                        </label>
+                    @endif
+
+                    @error('photoUpload')
+                        <p class="text-xs text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
         </div>
 
-        <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Date of Birth</label>
-            <input wire:model="date_of_birth" type="date"
-                   class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
-            <label class="flex items-center gap-2 mt-1 text-xs text-gray-500">
-                <input wire:model="dob_year_unknown" type="checkbox" class="rounded">
-                Year unknown (day/month only)
-            </label>
+        <div class="border-t border-gray-100 pt-4">
+            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Primary Name</p>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">First Name</label>
+                    <input wire:model="firstName" type="text"
+                           class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Last Name</label>
+                    <input wire:model="lastName" type="text"
+                           class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mt-3">
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Middle Names</label>
+                    <input wire:model="middleNames" type="text"
+                           class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Preferred Name</label>
+                    <input wire:model="preferredName" type="text"
+                           class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"
+                           placeholder="Nickname">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mt-3">
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Name Type</label>
+                    <select wire:model="nameType"
+                            class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="birth">Birth</option>
+                        <option value="married">Married</option>
+                        <option value="preferred">Preferred</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="flex items-end pb-2">
+                    <label class="flex items-center gap-2 text-xs text-gray-600">
+                        <input wire:model="spellingUncertain" type="checkbox" class="rounded">
+                        Spelling uncertain
+                    </label>
+                </div>
+            </div>
         </div>
 
-        <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Date of Death</label>
-            <input wire:model="date_of_death" type="date"
-                   class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
-        </div>
+        <div class="border-t border-gray-100 pt-4">
+            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Personal Details</p>
 
-        <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">General Notes</label>
-            <textarea wire:model="notes" rows="4"
-                      class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"
-                      placeholder="General notes about this person..."></textarea>
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Gender</label>
+                <select wire:model="gender"
+                        class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="">— Unknown —</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="unknown">Other / Unknown</option>
+                </select>
+            </div>
+
+            <div class="mt-3">
+                <label class="block text-xs font-medium text-gray-600 mb-1">Date of Birth</label>
+                <input wire:model="date_of_birth" type="date"
+                       class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+                <label class="flex items-center gap-2 mt-1 text-xs text-gray-500">
+                    <input wire:model="dob_year_unknown" type="checkbox" class="rounded">
+                    Year unknown (day/month only)
+                </label>
+            </div>
+
+            <div class="mt-3">
+                <label class="block text-xs font-medium text-gray-600 mb-1">Date of Death</label>
+                <input wire:model="date_of_death" type="date"
+                       class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+
+            <div class="mt-3">
+                <label class="block text-xs font-medium text-gray-600 mb-1">General Notes</label>
+                <textarea wire:model="notes" rows="4"
+                          class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          placeholder="General notes about this person..."></textarea>
+            </div>
         </div>
 
         <div class="flex gap-3 pt-2">
@@ -57,11 +157,35 @@
         </div>
 
     </form>
-    @else
-    {{-- Display Mode --}}
-    <div class="space-y-4">
 
-        {{-- Basic Info --}}
+    @else
+    {{-- ================================================================
+         DISPLAY MODE
+         ================================================================ --}}
+    <div class="space-y-5">
+
+        {{-- Photo + Name --}}
+        <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center flex-shrink-0">
+                @if($person->photo)
+                    <img src="{{ $person->photo->data_uri }}"
+                         alt="{{ $person->display_name }}" class="w-full h-full object-cover">
+                @else
+                    <span class="text-xl font-bold"
+                          style="color: {{ config('entry_types.gender_colors')[$person->gender ?? 'unknown'] }}">
+                        {{ strtoupper(substr($person->display_name, 0, 1)) }}
+                    </span>
+                @endif
+            </div>
+            <div>
+                <p class="text-lg font-semibold text-gray-800">{{ $person->display_name }}</p>
+                @if($person->primaryName && $person->primaryName->spelling_uncertain)
+                    <p class="text-xs text-amber-500">Spelling uncertain</p>
+                @endif
+            </div>
+        </div>
+
+        {{-- Personal Details --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <p class="text-xs text-gray-400 mb-0.5">Gender</p>
@@ -90,14 +214,14 @@
             @endif
         </div>
 
-        {{-- Names --}}
+        {{-- All Names --}}
         <div>
             <livewire:people.person-show.manage-person-names
                 :person="$person"
                 :key="'names-'.$person->id" />
         </div>
 
-        {{-- Current Address --}}
+         {{-- Current Address --}}
         <div>
             <p class="text-xs text-gray-400 mb-2">Current Address</p>
             @php $currentAddress = $person->addresses->where('is_current', true)->first(); @endphp
