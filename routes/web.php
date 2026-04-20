@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Livewire\ContactSyncReviews;
 use App\Livewire\Dashboard;
 use App\Livewire\People\PeopleIndex;
 use App\Livewire\People\PersonShow;
@@ -59,6 +60,8 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/timeline', Timeline::class)->name('timeline');
 
     Route::get('/tasks', Tasks::class)->name('tasks');
+
+    Route::get('/contact-sync', ContactSyncReviews::class)->name('contact-sync');
 
     Route::get('/settings', Settings::class)->name('settings');
 

@@ -25,13 +25,11 @@ class GoogleContactsService
      */
     public function searchContacts(string $query): Collection
     {
-        $response = $this->client->http()
-            ->get(self::BASE_URL . '/people:searchContacts', [
+        $response = $this->client->get(self::BASE_URL . '/people:searchContacts', [
                 'query'      => $query,
-                'readMask'   => 'names,emailAddresses,phoneNumbers',
+                'readMask'   => 'names,emailAddresses,phoneNumbers,photos',
                 'pageSize'   => 10,
             ]);
-        //\Log::debug('Google contacts raw response', ['body' => $response]);
 
         if (!$response->successful()) {
             return collect();
@@ -48,8 +46,7 @@ class GoogleContactsService
      */
     public function getContact(string $resourceName): ?array
     {
-        $response = $this->client->http()
-            ->get(self::BASE_URL . '/' . $resourceName, [
+        $response = $this->client->get(self::BASE_URL . '/' . $resourceName, [
                 'personFields' => 'names,emailAddresses,phoneNumbers,addresses,photos,genders,birthdays,events,nicknames',
             ]);
 
@@ -58,6 +55,34 @@ class GoogleContactsService
         }
 
         return $this->formatContact($response->json());
+    }
+
+    /**
+     * Update specific fields on a Google Contact using the People API PATCH endpoint.
+     * Requires the contact's etag (for optimistic concurrency) and the field mask.
+     *
+     * @param string $resourceName  e.g. 'people/c12345'
+     * @param array  $fields        The fields to update, e.g. ['names' => [...]]
+     * @param string|null $etag     The etag from the contact's raw data
+     * @param string $updateMask    Comma-separated field mask e.g. 'names,birthdays'
+     */
+    public function updateContactFields(
+        string $resourceName,
+        array $fields,
+        ?string $etag,
+        string $updateMask
+    ): bool {
+        $body = array_merge($fields, [
+            'etag' => $etag,
+        ]);
+
+        $response = $this->client->patch(
+            self::BASE_URL . '/' . $resourceName . ':updateContact',
+            $body,
+            ['updatePersonFields' => $updateMask]
+        );
+
+        return $response->successful();
     }
 
     /**

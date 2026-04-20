@@ -32,6 +32,15 @@
                 <x-nav-link :href="route('tasks')" :active="request()->routeIs('tasks')">
                     Tasks
                 </x-nav-link>
+                <x-nav-link :href="route('contact-sync')" :active="request()->routeIs('contact-sync')">
+                    @php $pendingSyncCount = auth()->user() ? \App\Models\ContactSyncReview::where('user_id', auth()->id())->where('status', 'pending')->count() : 0; @endphp
+                    Contact Sync
+                    @if($pendingSyncCount > 0)
+                        <span class="ml-1 bg-amber-400 text-white text-xs px-1.5 py-0.5 rounded-full leading-none">
+                            {{ $pendingSyncCount }}
+                        </span>
+                    @endif
+                </x-nav-link>
                 <x-nav-link :href="route('settings')" :active="request()->routeIs('settings')">
                     Settings
                 </x-nav-link>
@@ -95,6 +104,14 @@
                 <x-nav-link :href="route('tasks')" :active="request()->routeIs('tasks')" mobile>
                     Tasks
                 </x-nav-link>
+                <x-nav-link :href="route('contact-sync')" :active="request()->routeIs('contact-sync')" mobile>
+                    Contact Sync
+                    @if(isset($pendingSyncCount) && $pendingSyncCount > 0)
+                        <span class="ml-1 bg-amber-400 text-white text-xs px-1.5 py-0.5 rounded-full leading-none">
+                            {{ $pendingSyncCount }}
+                        </span>
+                    @endif
+                </x-nav-link>
                 <x-nav-link :href="route('settings')" :active="request()->routeIs('settings')" mobile>
                     Settings
                 </x-nav-link>
@@ -151,7 +168,7 @@
         style="display: none;">
         <span x-text="message"></span>
     </div>
-
+    
     {{-- DB Error Toast --}}
     <div
         x-data="{ show: false, detail: '', showModal: false }"
@@ -200,6 +217,7 @@
             </div>
         </div>
     </div>
+
 
     @livewireScriptConfig
     @stack('scripts')

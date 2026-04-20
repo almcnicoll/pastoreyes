@@ -24,8 +24,7 @@ class GoogleCalendarService
      */
     public function getEditableCalendars(): Collection
     {
-        $response = $this->client->http()
-            ->get(self::BASE_URL . '/users/me/calendarList');
+        $response = $this->client->get(self::BASE_URL . '/users/me/calendarList');
 
         if (!$response->successful()) {
             return collect();
@@ -49,8 +48,7 @@ class GoogleCalendarService
     {
         $event = $this->buildEventPayload($keyDate);
 
-        $response = $this->client->http()
-            ->post(self::BASE_URL . "/calendars/{$calendarId}/events", $event);
+        $response = $this->client->post(self::BASE_URL . "/calendars/{$calendarId}/events", $event);
 
         if ($response->successful()) {
             return $response->json('id');
@@ -72,8 +70,7 @@ class GoogleCalendarService
         $calId    = urlencode($keyDate->google_calendar_id);
         $eventId  = $keyDate->google_calendar_event_id;
 
-        $response = $this->client->http()
-            ->put(self::BASE_URL . "/calendars/{$calId}/events/{$eventId}", $event);
+        $response = $this->client->put(self::BASE_URL . "/calendars/{$calId}/events/{$eventId}", $event);
 
         return $response->successful();
     }
@@ -90,8 +87,7 @@ class GoogleCalendarService
         $calId   = urlencode($keyDate->google_calendar_id);
         $eventId = $keyDate->google_calendar_event_id;
 
-        $response = $this->client->http()
-            ->delete(self::BASE_URL . "/calendars/{$calId}/events/{$eventId}");
+        $response = $this->client->delete(self::BASE_URL . "/calendars/{$calId}/events/{$eventId}");
 
         return $response->successful() || $response->status() === 410; // 410 = already deleted
     }
@@ -109,8 +105,7 @@ class GoogleCalendarService
         $calId   = urlencode($keyDate->google_calendar_id);
         $eventId = $keyDate->google_calendar_event_id;
 
-        $response = $this->client->http()
-            ->get(self::BASE_URL . "/calendars/{$calId}/events/{$eventId}");
+        $response = $this->client->get(self::BASE_URL . "/calendars/{$calId}/events/{$eventId}");
 
         if (!$response->successful()) {
             return null;

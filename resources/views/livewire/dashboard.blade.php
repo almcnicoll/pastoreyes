@@ -121,6 +121,28 @@
             @endif
         </div>
 
+        {{-- Contact Sync Reviews --}}
+        @php $pendingSyncCount = \App\Models\ContactSyncReview::where('user_id', auth()->id())->where('status', 'pending')->count(); @endphp
+        @if($pendingSyncCount > 0)
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-5 md:col-span-2">
+            <h2 class="text-base font-semibold text-amber-800 mb-2 flex items-center gap-2">
+                <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 9v2m0 4h.01M12 3a9 9 0 100 18A9 9 0 0012 3z"/>
+                </svg>
+                Contact Sync
+            </h2>
+            <p class="text-sm text-amber-700">
+                {{ $pendingSyncCount }} {{ Str::plural('difference', $pendingSyncCount) }} detected
+                between PastorEyes and Google Contacts.
+            </p>
+            <a href="{{ route('contact-sync') }}"
+               class="mt-3 inline-block text-sm font-medium text-amber-800 hover:underline">
+                Review differences →
+            </a>
+        </div>
+        @endif
+
         {{-- Approaching Goal Targets --}}
         <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
             <h2 class="text-base font-semibold text-gray-700 mb-4 flex items-center gap-2">
