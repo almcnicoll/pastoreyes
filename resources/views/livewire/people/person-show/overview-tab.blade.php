@@ -227,11 +227,16 @@
                 :key="'names-'.$person->id" />
         </div>
 
-        {{-- Addresses --}}
+         {{-- Current Address --}}
         <div>
-            <livewire:people.person-show.manage-addresses
-                :person="$person"
-                :key="'addresses-'.$person->id" />
+            <p class="text-xs text-gray-400 mb-2">Current Address</p>
+            @php $currentAddress = $person->addresses->where('is_current', true)->first(); @endphp
+            @if($currentAddress)
+                <p class="text-sm text-gray-700">{{ $currentAddress->formatted }}</p>
+                <p class="text-xs text-gray-400 mt-0.5">Added {{ \Carbon\Carbon::parse($currentAddress->date_added)->format('j M Y') }}</p>
+            @else
+                <p class="text-sm text-gray-400">No address recorded.</p>
+            @endif
         </div>
 
         {{-- Google Contact --}}
