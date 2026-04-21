@@ -20,8 +20,6 @@ class Person extends Model
         'user_id',
         'google_contact_id',
         'gender',
-        'date_of_birth',
-        'dob_year_unknown',
         'date_of_death',
         'notes',
     ];
@@ -29,11 +27,17 @@ class Person extends Model
     protected function casts(): array
     {
         return [
-            'date_of_birth'   => EncryptedCast::class,
-            'date_of_death'   => EncryptedCast::class,
-            'notes'           => EncryptedCast::class,
-            'dob_year_unknown' => 'boolean',
+            'date_of_death' => EncryptedCast::class,
+            'notes'         => EncryptedCast::class,
         ];
+    }
+
+    /**
+     * Get the birthday KeyDate for this person, if one exists.
+     */
+    public function getBirthdayAttribute(): ?KeyDate
+    {
+        return $this->keyDates()->where('type', 'birthday')->first();
     }
 
     /**

@@ -80,17 +80,7 @@
                     </label>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">
-                        Date of Birth <span class="text-gray-400">(optional)</span>
-                    </label>
-                    <input wire:model="dateOfBirth" type="date"
-                           class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
-                    <label class="flex items-center gap-2 mt-1 text-xs text-gray-500">
-                        <input wire:model="dobYearUnknown" type="checkbox" class="rounded">
-                        Year unknown (day/month only)
-                    </label>
-                </div>
+                <p class="text-xs text-gray-400">Birthday and other details can be added from the person's profile.</p>
 
                 <div class="flex gap-3 pt-2">
                     <button type="submit"

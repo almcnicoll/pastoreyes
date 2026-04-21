@@ -2,6 +2,7 @@
 
 namespace App\Livewire\People\PersonShow;
 
+use App\Models\KeyDate;
 use App\Models\Person;
 use App\Models\PersonName;
 use App\Models\PersonPhoto;
@@ -17,12 +18,15 @@ class OverviewTab extends Component
 
     // Person fields
     public ?string $gender = null;
-    public ?string $date_of_birth = null;
-    public bool $dob_year_unknown = false;
     public ?string $date_of_death = null;
     public ?string $notes = null;
 
-    // Primary name fields (inline in the same form)
+    // Birthday — stored as a KeyDate, not on Person
+    public ?int $birthdayKeyDateId = null;
+    public ?string $birthday = null;
+    public bool $birthdayYearUnknown = false;
+
+    // Primary name fields
     public ?int $primaryNameId = null;
     public string $firstName = '';
     public string $lastName = '';
@@ -43,17 +47,25 @@ class OverviewTab extends Component
 
     public function resetForm(): void
     {
-        $this->gender           = $this->person->gender;
-        $this->date_of_birth    = $this->person->date_of_birth
-            ? \Carbon\Carbon::parse($this->person->date_of_birth)->format('Y-m-d')
-            : null;
-        $this->dob_year_unknown = $this->person->dob_year_unknown;
-        $this->date_of_death    = $this->person->date_of_death
+        $this->gender      = $this->person->gender;
+        $this->date_of_death = $this->person->date_of_death
             ? \Carbon\Carbon::parse($this->person->date_of_death)->format('Y-m-d')
             : null;
-        $this->notes            = $this->person->notes;
+        $this->notes       = $this->person->notes;
 
-        // Load primary name fields
+        // Load birthday from KeyDate
+        $birthdayKd = $this->person->keyDates()->where('type', 'birthday')->first();
+        if ($birthdayKd) {
+            $this->birthdayKeyDateId  = $birthdayKd->id;
+            $this->birthday           = $birthdayKd->date->format('Y-m-d');
+            $this->birthdayYearUnknown = $birthdayKd->year_unknown;
+        } else {
+            $this->birthdayKeyDateId  = null;
+            $this->birthday           = null;
+            $this->birthdayYearUnknown = false;
+        }
+
+        // Load primary name
         $primary = $this->person->names->firstWhere('is_primary', true)
             ?? $this->person->names->first();
 
@@ -93,26 +105,27 @@ class OverviewTab extends Component
     public function save(): void
     {
         $this->validate([
-            'gender'        => 'nullable|in:male,female,unknown',
-            'date_of_birth' => 'nullable|date',
-            'date_of_death' => 'nullable|date',
-            'notes'         => 'nullable|string|max:10000',
-            'firstName'     => 'nullable|string|max:255',
-            'lastName'      => 'nullable|string|max:255',
-            'middleNames'   => 'nullable|string|max:255',
-            'preferredName' => 'nullable|string|max:255',
-            'nameType'      => 'required|in:birth,married,preferred,other',
-            'photoUpload'   => 'nullable|image|max:10240',
+            'gender'               => 'nullable|in:male,female,unknown',
+            'birthday'             => 'nullable|date',
+            'date_of_death'        => 'nullable|date',
+            'notes'                => 'nullable|string|max:10000',
+            'firstName'            => 'nullable|string|max:255',
+            'lastName'             => 'nullable|string|max:255',
+            'middleNames'          => 'nullable|string|max:255',
+            'preferredName'        => 'nullable|string|max:255',
+            'nameType'             => 'required|in:birth,married,preferred,other',
+            'photoUpload'          => 'nullable|image|max:10240',
         ]);
 
-        // Save person fields
+        // Save person fields (no date_of_birth here)
         $this->person->update([
-            'gender'           => $this->gender,
-            'date_of_birth'    => $this->date_of_birth,
-            'dob_year_unknown' => $this->dob_year_unknown,
-            'date_of_death'    => $this->date_of_death,
-            'notes'            => $this->notes,
+            'gender'        => $this->gender,
+            'date_of_death' => $this->date_of_death,
+            'notes'         => $this->notes,
         ]);
+
+        // Save birthday as KeyDate
+        $this->saveBirthday();
 
         // Save primary name
         $nameData = [
@@ -136,11 +149,10 @@ class OverviewTab extends Component
             ]));
         }
 
-        // Handle photo removal
+        // Handle photo
         if ($this->removePhoto) {
             $this->person->photo?->delete();
         } elseif ($this->photoUpload) {
-            // Store photo as encrypted base64
             $bytes    = file_get_contents($this->photoUpload->getRealPath());
             $mimeType = $this->photoUpload->getMimeType();
             $fileSize = strlen($bytes);
@@ -165,6 +177,38 @@ class OverviewTab extends Component
         $this->person->refresh()->load(['names', 'addresses', 'photo']);
         $this->editing = false;
         $this->dispatch('notify', message: 'Profile updated.');
+    }
+
+    protected function saveBirthday(): void
+    {
+        if ($this->birthday) {
+            $data = [
+                'user_id'      => $this->person->user_id,
+                'date'         => $this->birthday,
+                'year_unknown' => $this->birthdayYearUnknown,
+                'type'         => 'birthday',
+                'is_recurring' => true,
+                'significance' => 3,
+                'logged_at'    => now(),
+            ];
+
+            if ($this->birthdayKeyDateId) {
+                $kd = KeyDate::find($this->birthdayKeyDateId);
+                if ($kd) {
+                    $kd->update($data);
+                }
+            } else {
+                $kd = KeyDate::create($data);
+                $kd->persons()->attach($this->person->id, ['is_primary' => true]);
+                $this->birthdayKeyDateId = $kd->id;
+            }
+        } else {
+            // Birthday cleared — delete the KeyDate if one exists
+            if ($this->birthdayKeyDateId) {
+                KeyDate::find($this->birthdayKeyDateId)?->delete();
+                $this->birthdayKeyDateId = null;
+            }
+        }
     }
 
     public function render()

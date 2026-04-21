@@ -23,8 +23,6 @@ class AddPerson extends Component
 
     // Person fields
     public string $gender = '';
-    public string $dateOfBirth = '';
-    public bool $dobYearUnknown = false;
 
     protected $listeners = [
         'open-add-person' => 'openModal',
@@ -34,7 +32,7 @@ class AddPerson extends Component
     {
         $this->reset([
             'firstName', 'lastName', 'preferredName', 'nameType',
-            'spellingUncertain', 'gender', 'dateOfBirth', 'dobYearUnknown',
+            'spellingUncertain', 'gender',
         ]);
         $this->nameType = 'birth';
         $this->open     = true;
@@ -47,7 +45,6 @@ class AddPerson extends Component
             'lastName'    => 'nullable|string|max:255',
             'nameType'    => 'required|in:birth,married,preferred,other',
             'gender'      => 'nullable|in:male,female,unknown',
-            'dateOfBirth' => 'nullable|date',
         ]);
 
         // Require at least one name field
@@ -60,8 +57,6 @@ class AddPerson extends Component
             $person = Person::create([
                 'user_id'         => auth()->id(),
                 'gender'          => $this->gender ?: null,
-                'date_of_birth'   => $this->dateOfBirth ?: null,
-                'dob_year_unknown' => $this->dobYearUnknown,
             ]);
 
             PersonName::create([

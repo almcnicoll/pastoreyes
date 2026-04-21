@@ -143,7 +143,7 @@ class ContactSyncService
         $birthdays = $rawData['birthdays'] ?? [];
 
         if (empty($birthdays)) {
-            return 0; // Google has no birthday — not a difference worth flagging
+            return 0;
         }
 
         $date        = $birthdays[0]['date'] ?? null;
@@ -153,24 +153,23 @@ class ContactSyncService
             return 0;
         }
 
-        $year        = $yearUnknown ? now()->year : $date['year'];
-        $googleDate  = Carbon::createFromDate($year, $date['month'], $date['day'])->format('Y-m-d');
-        $localDate   = $person->date_of_birth
-            ? Carbon::parse($person->date_of_birth)->format('Y-m-d')
-            : null;
+        $year       = $yearUnknown ? now()->year : $date['year'];
+        $googleDate = Carbon::createFromDate($year, $date['month'], $date['day'])->format('Y-m-d');
+
+        // Read birthday from KeyDate, not from Person.date_of_birth
+        $birthdayKd = $person->keyDates()->where('type', 'birthday')->first();
+        $localDate  = $birthdayKd ? $birthdayKd->date->format('Y-m-d') : null;
 
         // When year is unknown compare only month/day
         if ($yearUnknown && $localDate) {
-            $googleMD = substr($googleDate, 5);
-            $localMD  = substr($localDate, 5);
-            if ($googleMD === $localMD) {
+            if (substr($googleDate, 5) === substr($localDate, 5)) {
                 return 0;
             }
         }
 
         if ($this->valuesDiffer($localDate, $googleDate)) {
             $localDisplay  = $localDate
-                ? Carbon::parse($localDate)->format($person->dob_year_unknown ? 'j F' : 'j F Y')
+                ? Carbon::parse($localDate)->format(($birthdayKd?->year_unknown) ? 'j F' : 'j F Y')
                 : '(none)';
             $googleDisplay = $yearUnknown
                 ? Carbon::parse($googleDate)->format('j F') . ' (year unknown in Google)'

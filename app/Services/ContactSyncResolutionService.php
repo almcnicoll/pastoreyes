@@ -93,20 +93,31 @@ class ContactSyncResolutionService
 
     protected function pullBirthday(Person $person, ContactSyncReview $review): void
     {
-        // Parse the display string back to a date
-        // Google value will be like "15 March 1980" or "15 March (year unknown in Google)"
         $googleValue = $review->google_value ?? '';
         $yearUnknown = str_contains($googleValue, 'year unknown');
-
-        // Strip the suffix to get a parseable date string
-        $datePart = str_replace(' (year unknown in Google)', '', $googleValue);
+        $datePart    = str_replace(' (year unknown in Google)', '', $googleValue);
 
         try {
             $date = Carbon::parse($datePart);
-            $person->update([
-                'date_of_birth'    => $date->format('Y-m-d'),
-                'dob_year_unknown' => $yearUnknown,
-            ]);
+
+            $existingKd = $person->keyDates()->where('type', 'birthday')->first();
+
+            $data = [
+                'user_id'      => $person->user_id,
+                'date'         => $date->format('Y-m-d'),
+                'year_unknown' => $yearUnknown,
+                'type'         => 'birthday',
+                'is_recurring' => true,
+                'significance' => 3,
+                'logged_at'    => now(),
+            ];
+
+            if ($existingKd) {
+                $existingKd->update($data);
+            } else {
+                $kd = \App\Models\KeyDate::create($data);
+                $kd->persons()->attach($person->id, ['is_primary' => true]);
+            }
         } catch (\Exception $e) {
             Log::warning('ContactSyncResolution: failed to parse birthday "' . $googleValue . '": ' . $e->getMessage());
         }
@@ -217,7 +228,9 @@ class ContactSyncResolutionService
 
     protected function pushBirthdayToGoogle(Person $person, ContactSyncReview $review): void
     {
-        if (!$person->date_of_birth || !$person->google_contact_id) {
+        $birthdayKd = $person->keyDates()->where('type', 'birthday')->first();
+
+        if (!$birthdayKd || !$person->google_contact_id) {
             return;
         }
 
@@ -228,9 +241,9 @@ class ContactSyncResolutionService
 
         $rawData = $contact['rawData'] ?? [];
         $etag    = $rawData['etag'] ?? null;
-        $date    = Carbon::parse($person->date_of_birth);
+        $date    = $birthdayKd->date;
 
-        $birthday = $person->dob_year_unknown
+        $birthday = $birthdayKd->year_unknown
             ? ['month' => (int) $date->month, 'day' => (int) $date->day]
             : ['year' => (int) $date->year, 'month' => (int) $date->month, 'day' => (int) $date->day];
 

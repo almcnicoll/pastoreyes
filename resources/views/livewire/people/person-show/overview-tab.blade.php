@@ -9,7 +9,7 @@
 
     @if($editing)
     {{-- ================================================================
-         EDIT FORM — combined person, primary name, and photo
+         EDIT FORM
          ================================================================ --}}
     <form wire:submit="save" class="space-y-5">
 
@@ -17,22 +17,17 @@
         <div>
             <label class="block text-xs font-medium text-gray-600 mb-2">Photo</label>
             <div class="flex items-center gap-4">
-
-                {{-- Current photo preview --}}
                 <div class="w-16 h-16 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center flex-shrink-0">
                     @if($photoUpload)
-                        <img src="{{ $photoUpload->temporaryUrl() }}"
-                             alt="Preview" class="w-full h-full object-cover">
+                        <img src="{{ $photoUpload->temporaryUrl() }}" alt="Preview" class="w-full h-full object-cover">
                     @elseif($person->photo && !$removePhoto)
-                        <img src="{{ $person->photo->data_uri }}"
-                             alt="{{ $person->display_name }}" class="w-full h-full object-cover">
+                        <img src="{{ $person->photo->data_uri }}" alt="{{ $person->display_name }}" class="w-full h-full object-cover">
                     @else
                         <span class="text-xl font-bold text-gray-400">
                             {{ strtoupper(substr($person->display_name, 0, 1)) }}
                         </span>
                     @endif
                 </div>
-
                 <div class="space-y-1.5">
                     <label class="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -42,14 +37,12 @@
                         {{ $person->photo ? 'Replace photo' : 'Upload photo' }}
                         <input wire:model="photoUpload" type="file" accept="image/*" class="hidden">
                     </label>
-
                     @if($person->photo && !$removePhoto)
                         <label class="flex items-center gap-1.5 text-xs text-red-500 cursor-pointer">
                             <input wire:model="removePhoto" type="checkbox" class="rounded">
                             Remove photo
                         </label>
                     @endif
-
                     @error('photoUpload')
                         <p class="text-xs text-red-500">{{ $message }}</p>
                     @enderror
@@ -57,9 +50,9 @@
             </div>
         </div>
 
+        {{-- Primary Name --}}
         <div class="border-t border-gray-100 pt-4">
             <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Primary Name</p>
-
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">First Name</label>
@@ -72,7 +65,6 @@
                            class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
                 </div>
             </div>
-
             <div class="grid grid-cols-2 gap-3 mt-3">
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Middle Names</label>
@@ -86,7 +78,6 @@
                            placeholder="Nickname">
                 </div>
             </div>
-
             <div class="grid grid-cols-2 gap-3 mt-3">
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Name Type</label>
@@ -107,6 +98,7 @@
             </div>
         </div>
 
+        {{-- Personal Details --}}
         <div class="border-t border-gray-100 pt-4">
             <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Personal Details</p>
 
@@ -121,14 +113,21 @@
                 </select>
             </div>
 
+            {{-- Birthday (stored as KeyDate) --}}
             <div class="mt-3">
-                <label class="block text-xs font-medium text-gray-600 mb-1">Date of Birth</label>
-                <input wire:model="date_of_birth" type="date"
+                <label class="block text-xs font-medium text-gray-600 mb-1">
+                    Birthday
+                    <span class="text-gray-400 font-normal">(also shown under Key Dates)</span>
+                </label>
+                <input wire:model="birthday" type="date"
                        class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
                 <label class="flex items-center gap-2 mt-1 text-xs text-gray-500">
-                    <input wire:model="dob_year_unknown" type="checkbox" class="rounded">
+                    <input wire:model="birthdayYearUnknown" type="checkbox" class="rounded">
                     Year unknown (day/month only)
                 </label>
+                @error('birthday')
+                    <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
             <div class="mt-3">
@@ -186,51 +185,53 @@
         </div>
 
         {{-- Personal Details --}}
+        @php
+            $birthdayKd = $person->keyDates()->where('type', 'birthday')->first();
+            $deathDate  = $person->date_of_death ? \Carbon\Carbon::parse($person->date_of_death) : null;
+        @endphp
+
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <p class="text-xs text-gray-400 mb-0.5">Gender</p>
                 <p class="text-sm text-gray-700">{{ ucfirst($person->gender ?? 'Unknown') }}</p>
             </div>
-            @if($person->date_of_birth)
+
+            @if($birthdayKd)
             <div>
-                <p class="text-xs text-gray-400 mb-0.5">Date of Birth</p>
+                <p class="text-xs text-gray-400 mb-0.5">Birthday</p>
                 <p class="text-sm text-gray-700">
-                    @if($person->dob_year_unknown)
-                        {{ \Carbon\Carbon::parse($person->date_of_birth)->format('j F') }} (year unknown)
+                    @if($birthdayKd->year_unknown)
+                        {{ $birthdayKd->date->format('j F') }} (year unknown)
                     @else
-                        {{ \Carbon\Carbon::parse($person->date_of_birth)->format('j F Y') }}
-                        @if(!$person->date_of_death)
-                            <span class="text-gray-400">(age {{ \Carbon\Carbon::parse($person->date_of_birth)->age }})</span>
+                        {{ $birthdayKd->date->format('j F Y') }}
+                        @if(!$deathDate)
+                            <span class="text-gray-400">(age {{ $birthdayKd->date->age }})</span>
                         @endif
                     @endif
                 </p>
             </div>
             @endif
-            @if($person->date_of_death)
+
+            @if($deathDate)
             <div>
                 <p class="text-xs text-gray-400 mb-0.5">Date of Death</p>
-                <p class="text-sm text-gray-700">{{ \Carbon\Carbon::parse($person->date_of_death)->format('j F Y') }}</p>
+                <p class="text-sm text-gray-700">{{ $deathDate->format('j F Y') }}</p>
             </div>
             @endif
         </div>
 
-        {{-- All Names --}}
+        {{-- Names --}}
         <div>
             <livewire:people.person-show.manage-person-names
                 :person="$person"
                 :key="'names-'.$person->id" />
         </div>
 
-         {{-- Current Address --}}
+        {{-- Addresses --}}
         <div>
-            <p class="text-xs text-gray-400 mb-2">Current Address</p>
-            @php $currentAddress = $person->addresses->where('is_current', true)->first(); @endphp
-            @if($currentAddress)
-                <p class="text-sm text-gray-700">{{ $currentAddress->formatted }}</p>
-                <p class="text-xs text-gray-400 mt-0.5">Added {{ \Carbon\Carbon::parse($currentAddress->date_added)->format('j M Y') }}</p>
-            @else
-                <p class="text-sm text-gray-400">No address recorded.</p>
-            @endif
+            <livewire:people.person-show.manage-addresses
+                :person="$person"
+                :key="'addresses-'.$person->id" />
         </div>
 
         {{-- Google Contact --}}
