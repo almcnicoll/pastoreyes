@@ -49,10 +49,16 @@ Route::view('/privacy', 'privacy')->name('privacy');
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'active'])->group(function () {
 
-    // Dashboard
-    Route::get('/', fn() => redirect()->route('dashboard'));
+// Public index page for guests
+Route::get('/', function () {
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+    return view('index');
+})->name('index');
+
+Route::middleware(['auth', 'active'])->group(function () {
 
     Route::get('/dashboard', Dashboard::class)->name('dashboard');
 
