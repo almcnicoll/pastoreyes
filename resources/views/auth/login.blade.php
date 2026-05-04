@@ -60,4 +60,11 @@
     </div>
 
 </body>
+<footer>
+    <div class="max-w-7xl mx-auto px-4 lg:px-6 py-4 text-center text-xs text-gray-400">
+        © 2026 PastorEyes. All rights reserved. ·
+        <a href="http://localhost/pastoreyes/public/privacy" class="hover:underline">Privacy Policy</a> ·
+        <a href="http://localhost/pastoreyes/public/terms" class="hover:underline">Terms of Service</a>
+    </div>
+</footer>
 </html>

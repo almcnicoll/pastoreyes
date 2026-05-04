@@ -222,4 +222,11 @@
     @livewireScriptConfig
     @stack('scripts')
 </body>
+<footer>
+    <div class="max-w-7xl mx-auto px-4 lg:px-6 py-4 text-center text-xs text-gray-400">
+        &copy; {{ date('Y') }} PastorEyes. All rights reserved. &middot;
+        <a href="{{ route('privacy') }}" class="hover:underline">Privacy Policy</a> &middot;
+        <a href="{{ route('terms') }}" class="hover:underline">Terms of Service</a>
+    </div>
+</footer>
 </html>

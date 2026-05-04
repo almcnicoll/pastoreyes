@@ -40,6 +40,9 @@ Route::post('/logout', [GoogleAuthController::class, 'logout'])
     ->name('logout')
     ->middleware('auth');
 
+Route::view('/terms', 'terms')->name('terms');
+Route::view('/privacy', 'privacy')->name('privacy');
+
 /*
 |--------------------------------------------------------------------------
 | Authenticated Application Routes
