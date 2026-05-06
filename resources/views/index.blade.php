@@ -24,7 +24,7 @@
 
     <main class="max-w-7xl mx-auto px-4 lg:px-6 py-12">
         <div class="flex flex-col items-center justify-center min-h-[60vh]">
-            <img src="/icons/pastoreyes-logo.png" alt="PastorEyes Logo" class="w-24 h-24 mb-6">
+            <img src="{{ env('APP_URL') }}/icons/pastoreyes-logo.png" alt="PastorEyes Logo" class="w-24 h-24 mb-6">
             <h1 class="text-3xl font-bold mb-2">Welcome to PastorEyes</h1>
             <p class="text-lg text-gray-600 mb-4 text-center max-w-xl">
                 PastorEyes is an online platform for managing pastoral contacts, helping you keep track of your community and care for your people more effectively.
