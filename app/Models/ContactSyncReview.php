@@ -51,6 +51,13 @@ class ContactSyncReview extends Model
      */
     public function resolve(string $resolution): void
     {
+        // Remove any prior row that would collide on the unique key
+        static::where('person_id', $this->person_id)
+            ->where('field', $this->field)
+            ->where('status', $resolution)
+            ->where('id', '!=', $this->id)
+            ->delete();
+
         $this->update([
             'status'      => $resolution,
             'resolved_at' => now(),
