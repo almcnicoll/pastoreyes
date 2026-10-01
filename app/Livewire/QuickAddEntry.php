@@ -6,6 +6,7 @@ use App\Livewire\Concerns\CatchesDbErrors;
 use App\Models\Goal;
 use App\Models\KeyDate;
 use App\Models\Note;
+use App\Models\Person;
 use App\Models\PrayerNeed;
 use Livewire\Component;
 
@@ -14,7 +15,9 @@ class QuickAddEntry extends Component
     use CatchesDbErrors;
     public bool $open = false;
     public string $type = '';
-    public ?int $personId = null;
+    public array $selectedPersonIds = [];
+    public string $personSearch = '';
+    public $personResults = null;
 
     // Common fields
     public string $title = '';
@@ -26,24 +29,56 @@ class QuickAddEntry extends Component
     public ?string $targetDate = null;
 
     protected $listeners = [
-        'open-quick-add'  => 'openModal',
-        'person-selected' => 'onPersonSelected',
+        'open-quick-add' => 'openModal',
     ];
 
-    public function onPersonSelected(int $personId): void
-    {
-        $this->personId = $personId;
-    }
-
-    public function mount(): void
+    public function mount(?int $personId = null): void
     {
         $this->date = now()->format('Y-m-d');
+        $this->selectedPersonIds = $personId ? [$personId] : [];
     }
 
     public function openModal(?int $personId = null): void
     {
-        $this->personId = $personId;
-        $this->open     = true;
+        $this->selectedPersonIds = $personId ? [$personId] : [];
+        $this->open              = true;
+    }
+
+    public function updatedPersonSearch(): void
+    {
+        if (strlen($this->personSearch) < 1) {
+            $this->personResults = collect();
+            return;
+        }
+
+        $search          = strtolower($this->personSearch);
+        $alreadySelected = $this->selectedPersonIds;
+
+        $this->personResults = Person::where('user_id', auth()->id())
+            ->with('primaryName')
+            ->get()
+            ->filter(fn($p) =>
+                str_contains(strtolower($p->display_name), $search) &&
+                !in_array($p->id, $alreadySelected)
+            )
+            ->take(8)
+            ->values();
+    }
+
+    public function addPerson(int $personId): void
+    {
+        if (!in_array($personId, $this->selectedPersonIds)) {
+            $this->selectedPersonIds[] = $personId;
+        }
+        $this->personSearch  = '';
+        $this->personResults = collect();
+    }
+
+    public function removePerson(int $personId): void
+    {
+        $this->selectedPersonIds = array_values(
+            array_filter($this->selectedPersonIds, fn($id) => $id !== $personId)
+        );
     }
 
     public function updatedType(): void
@@ -57,7 +92,8 @@ class QuickAddEntry extends Component
     public function save(): void
     {
         $this->validate([
-            'personId'    => 'required|integer|exists:persons,id',
+            'selectedPersonIds'   => 'required|array|min:1',
+            'selectedPersonIds.*' => 'integer|exists:persons,id',
             'type'        => 'required|in:note,prayer_need,goal,key_date',
             'body'        => 'required|string',
             'significance' => 'required|integer|min:1|max:5',
@@ -72,10 +108,13 @@ class QuickAddEntry extends Component
         };
 
         if ($entry) {
-            $entry->persons()->attach($this->personId, ['is_primary' => true]);
+            // First person selected is the primary one (same convention as Timeline::saveEdit)
+            foreach ($this->selectedPersonIds as $i => $personId) {
+                $entry->persons()->attach($personId, ['is_primary' => $i === 0]);
+            }
         }
 
-        $this->reset(['open', 'type', 'personId', 'title', 'body', 'significance', 'targetDate']);
+        $this->reset(['open', 'type', 'selectedPersonIds', 'personSearch', 'personResults', 'title', 'body', 'significance', 'targetDate']);
         $this->date = now()->format('Y-m-d');
         $this->significance = 3;
 
@@ -122,13 +161,18 @@ class QuickAddEntry extends Component
 
     public function closeModal(): void
     {
-        $this->reset(['open', 'type', 'personId', 'title', 'body', 'targetDate']);
+        $this->reset(['open', 'type', 'selectedPersonIds', 'personSearch', 'personResults', 'title', 'body', 'targetDate']);
         $this->date        = now()->format('Y-m-d');
         $this->significance = 3;
     }
 
     public function render()
     {
-        return view('livewire.quick-add-entry');
+        // Keep chips in the order people were selected
+        $selectedPersons = Person::whereIn('id', $this->selectedPersonIds)->with('primaryName')->get()
+            ->sortBy(fn($p) => array_search($p->id, $this->selectedPersonIds))
+            ->values();
+
+        return view('livewire.quick-add-entry', ['selectedPersons' => $selectedPersons]);
     }
 }

@@ -35,12 +35,49 @@
 
             <form wire:submit="save" class="space-y-4">
 
-                {{-- Person Search --}}
+                {{-- People --}}
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Person</label>
-                    <livewire:person-search-select
-                        :value="$personId"
-                        :key="'quick-add-person-'.($open ? 'open' : 'closed')" />
+                    <label class="block text-xs font-medium text-gray-600 mb-1">People</label>
+
+                    @if(count($selectedPersonIds))
+                        <div class="flex flex-wrap gap-2 mb-2">
+                            @foreach($selectedPersons as $person)
+                                <span class="inline-flex items-center gap-1 px-2 py-1 bg-indigo-50 text-indigo-700 text-xs rounded-full">
+                                    {{ $person->display_name }}
+                                    <button type="button" wire:click="removePerson({{ $person->id }})"
+                                            class="text-indigo-400 hover:text-indigo-600">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                </span>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    <div class="relative">
+                        <input wire:model.live.debounce.200ms="personSearch"
+                               type="text"
+                               placeholder="Search to add a person..."
+                               class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"
+                               autocomplete="off">
+
+                        @if($personResults && $personResults->isNotEmpty())
+                            <div class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+                                @foreach($personResults as $person)
+                                    <button type="button"
+                                            wire:click="addPerson({{ $person->id }})"
+                                            class="w-full text-left px-3 py-2 text-sm hover:bg-indigo-50 transition-colors">
+                                        <span style="color: {{ config('entry_types.gender_colors')[$person->gender ?? 'unknown'] }}"
+                                              class="font-medium">
+                                            {{ $person->display_name }}
+                                        </span>
+                                    </button>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                    @error('selectedPersonIds') <p class="text-xs text-red-600 mt-1">Select at least one person.</p> @enderror
                 </div>
 
                 {{-- Entry Type --}}
