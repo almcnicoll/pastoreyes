@@ -91,8 +91,6 @@ class ImportUserData
                 'user_id'          => $user->id,
                 'google_contact_id' => $record['google_contact_id'] ?? null,
                 'gender'           => $record['gender'] ?? null,
-                'date_of_birth'    => $record['date_of_birth'] ?? null,
-                'dob_year_unknown' => $record['dob_year_unknown'] ?? false,
                 'date_of_death'    => $record['date_of_death'] ?? null,
                 'notes'            => $record['notes'] ?? null,
             ]);

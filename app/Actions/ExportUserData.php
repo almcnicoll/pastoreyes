@@ -57,8 +57,6 @@ class ExportUserData
             'id'               => $p->id,
             'google_contact_id' => $p->google_contact_id,
             'gender'           => $p->gender,
-            'date_of_birth'    => $p->date_of_birth,   // already decrypted by cast
-            'dob_year_unknown' => $p->dob_year_unknown,
             'date_of_death'    => $p->date_of_death,
             'notes'            => $p->notes,
         ])->toArray();
