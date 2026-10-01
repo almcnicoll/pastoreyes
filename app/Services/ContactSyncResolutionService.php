@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Address;
 use App\Models\ContactSyncReview;
+use App\Models\IgnoredSyncDifference;
 use App\Models\KeyDate;
 use App\Models\Person;
 use App\Models\PersonPhoto;
@@ -64,6 +65,14 @@ class ContactSyncResolutionService
      */
     public function ignore(ContactSyncReview $review): void
     {
+        IgnoredSyncDifference::remember(
+            auth()->user(),
+            $review->person_id,
+            $review->field,
+            $review->local_value,
+            $review->google_value,
+        );
+
         $review->resolve('ignored');
     }
 

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Address;
 use App\Models\ContactSyncReview;
 use App\Models\ContactSyncState;
+use App\Models\IgnoredSyncDifference;
 use App\Models\Person;
 use App\Models\User;
 use App\Services\Google\GoogleContactsService;
@@ -283,6 +284,10 @@ class ContactSyncService
     ): int {
         if (ContactSyncReview::pendingExistsFor($person->id, $field)) {
             return 0; // Already flagged — don't create a duplicate
+        }
+
+        if (IgnoredSyncDifference::isIgnored($this->user, $person->id, $field, $localValue, $googleValue)) {
+            return 0; // User already chose to ignore exactly this difference
         }
 
         ContactSyncReview::create([
