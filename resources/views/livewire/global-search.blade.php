@@ -37,6 +37,7 @@
                 <input x-ref="q"
                        wire:model.live.debounce.150ms="search"
                        x-on:keydown.arrow-down.prevent="$refs.list?.querySelector('a')?.focus()"
+                       x-on:focus="$el.select()"
                        type="search"
                        enterkeyhint="go"
                        autocomplete="off" autocapitalize="off" spellcheck="false"

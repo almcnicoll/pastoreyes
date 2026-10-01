@@ -324,7 +324,11 @@ class Timeline extends Component
         // Unknown-year dates (e.g. unknown birth year) are the oldest entries in either direction
         $unknownLast = $this->sortDirection === 'desc';
 
+        // ...and sort among themselves by day of year, since their stored year is made up
+        $dir = $this->sortDirection === 'desc' ? 'DESC' : 'ASC';
+
         return $query->orderBy('year_unknown', $unknownLast ? 'asc' : 'desc')
+            ->orderByRaw("CASE WHEN year_unknown = 1 THEN DATE_FORMAT(date, '%m%d') END {$dir}")
             ->orderBy('date', $this->sortDirection)
             ->get();
     }
