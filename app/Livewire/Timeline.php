@@ -321,7 +321,12 @@ class Timeline extends Component
             $query->where('date', '<=', $this->dateTo);
         }
 
-        return $query->orderBy('date', $this->sortDirection)->get();
+        // Unknown-year dates (e.g. unknown birth year) are the oldest entries in either direction
+        $unknownLast = $this->sortDirection === 'desc';
+
+        return $query->orderBy('year_unknown', $unknownLast ? 'asc' : 'desc')
+            ->orderBy('date', $this->sortDirection)
+            ->get();
     }
 
     public function render()

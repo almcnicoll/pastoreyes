@@ -32,6 +32,7 @@ class TimelineEntry extends Model
             'date'      => 'date',
             'logged_at' => 'datetime',
             'significance' => 'integer',
+            'year_unknown' => 'boolean',
             // Note: 'title' is encrypted in source tables but the view selects
             // the raw encrypted value. Decryption is handled by loading the
             // source model via entryable_type/entryable_id when full detail is needed.

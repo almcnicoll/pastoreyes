@@ -103,7 +103,7 @@
                             @endif
                         </div>
                         <p class="text-xs text-gray-400 mt-0.5">
-                            {{ $entry->date->format('j M Y') }}
+                            {{ $entry->date->format($entry->year_unknown ? 'j M' : 'j M Y') }}
                         </p>
                     </div>
 
