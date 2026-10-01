@@ -75,3 +75,27 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/settings', Settings::class)->name('settings');
 
 });
+
+/*
+|--------------------------------------------------------------------------
+| Local development login
+|--------------------------------------------------------------------------
+|
+| Skips Google sign-in. Only registered when APP_ENV=local, and still refuses
+| any host other than localhost. Logs in as the first administrator, or as
+| ?user=<id>. Never present in production/testing environments.
+|
+*/
+if (app()->environment('local')) {
+    Route::get('/dev-login', function (\Illuminate\Http\Request $request) {
+        abort_unless(in_array($request->getHost(), ['localhost', '127.0.0.1']), 404);
+
+        $user = $request->query('user')
+            ? \App\Models\User::findOrFail($request->query('user'))
+            : \App\Models\User::where('is_admin', true)->firstOrFail();
+
+        \Illuminate\Support\Facades\Auth::login($user);
+
+        return redirect()->route('dashboard');
+    })->name('dev-login');
+}

@@ -15,4 +15,9 @@ class PublicPagesTest extends TestCase
     {
         $this->get('/dashboard')->assertRedirect('/login');
     }
+
+    public function test_dev_login_does_not_exist_outside_the_local_environment(): void
+    {
+        $this->get('/dev-login')->assertNotFound();
+    }
 }

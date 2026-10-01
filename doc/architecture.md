@@ -90,6 +90,9 @@ every minute: `* * * * * cd /path-to-project && php artisan schedule:run >> /dev
 
 ## Routing / structure
 
+- `/dev-login` (local only) — skips Google sign-in for development. Registered only when
+  `APP_ENV=local` and refuses non-localhost hosts; logs in as the first admin or `?user=<id>`.
+
 - `routes/web.php` — public routes (`/`, `/login`, `/terms`, `/privacy`, Google OAuth)
   and an authenticated group (`dashboard`, `people`, `people/{person}`, `timeline`,
   `tasks`, `contact-sync`, `settings`) gated by `auth` + `active` (`EnsureUserIsActive`)
