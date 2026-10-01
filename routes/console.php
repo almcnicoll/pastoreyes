@@ -36,3 +36,9 @@ Schedule::command('pastoreyes:sync-contacts')
     ->withoutOverlapping()   // prevent a slow run from queuing a second instance
     ->runInBackground()      // don't block other scheduled tasks
     ->appendOutputTo(storage_path('logs/contact-sync.log'));
+
+// Prayer reminder emails: users choose their own days and times, so check every few minutes
+Schedule::command('pastoreyes:send-prayer-emails')
+    ->everyFiveMinutes()
+    ->withoutOverlapping()
+    ->appendOutputTo(storage_path('logs/prayer-emails.log'));

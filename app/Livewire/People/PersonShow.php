@@ -4,11 +4,13 @@ namespace App\Livewire\People;
 
 use App\Models\Person;
 use App\Services\Google\GoogleCalendarService;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 class PersonShow extends Component
 {
     public Person $person;
+    #[Url(as: 'tab')]
     public string $activeTab = 'overview';
 
     public function mount(Person $person): void

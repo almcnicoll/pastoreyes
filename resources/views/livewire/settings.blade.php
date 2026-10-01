@@ -11,10 +11,12 @@
                     'appearance'    => 'Appearance',
                     'rel_types'     => 'Relationship Types',
                     'key_dates'     => 'Key Date Defaults',
+                    'prayer_email'  => 'Prayer Emails',
                     'data'          => 'Data',
                 ];
                 if(auth()->user()->is_admin) {
                     $tabs['users'] = 'User Management';
+                    $tabs['mail']  = 'Mail';
                 }
             @endphp
             @foreach($tabs as $tab => $label)
@@ -24,7 +26,7 @@
                                 ? 'border-indigo-600 text-indigo-600'
                                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
                     {{ $label }}
-                    @if($tab === 'users' && auth()->user()->is_admin)
+                    @if(in_array($tab, ['users', 'mail']) && auth()->user()->is_admin)
                         <span class="ml-1 text-xs bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded-full">Admin</span>
                     @endif
                 </button>
@@ -296,8 +298,15 @@
     </div>
 
     {{-- Data Tab --}}
+    @elseif($activeTab === 'prayer_email')
+    <livewire:prayer-email-settings />
+
     @elseif($activeTab === 'data')
     <livewire:data-settings />
+
+    {{-- Mail Tab (admin only) --}}
+    @elseif($activeTab === 'mail' && auth()->user()->is_admin)
+    <livewire:mail-settings />
 
     {{-- User Management Tab (admin only) --}}
     @elseif($activeTab === 'users' && auth()->user()->is_admin)

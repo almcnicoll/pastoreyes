@@ -72,6 +72,22 @@ plus `app/Actions/ImportPersonFromGoogle.php` and `SyncKeyDateToCalendar.php`:
 - Recurring `KeyDate`s are intended to sync with Google Contacts; one-off dates
   with Google Calendar. Sync direction is still being finalized.
 
+## Scheduled jobs and email
+
+Both scheduled commands (`routes/console.php`) depend on one server cron entry running
+every minute: `* * * * * cd /path-to-project && php artisan schedule:run >> /dev/null 2>&1`.
+
+- `pastoreyes:sync-contacts` — hourly Google contact sync.
+- `pastoreyes:send-prayer-emails` — every 5 minutes. Each user opts in under Settings →
+  Prayer Emails (days, time of day, timezone, stored in `users.settings['prayer_email']`).
+  People with outstanding prayer requests are spread evenly across the user's chosen days
+  (`prayer_email_assignments`, balanced by `PrayerEmailScheduler::balance`, moving as few
+  people as possible). The email lists names and counts only, linking to
+  `/people/{id}?tab=goals_prayer` — so `APP_URL` must be correct in production.
+- SMTP is configured by an admin under Settings → Mail (`app_settings`, password encrypted
+  with `APP_KEY`) and overrides the `.env` mail config at boot (`AppServiceProvider`).
+  Mail is sent synchronously.
+
 ## Routing / structure
 
 - `routes/web.php` — public routes (`/`, `/login`, `/terms`, `/privacy`, Google OAuth)
