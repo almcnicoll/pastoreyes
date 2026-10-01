@@ -46,6 +46,9 @@
                 </x-nav-link>
             </div>
 
+            {{-- Global search (icon below xl, inline input at xl) --}}
+            <livewire:global-search />
+
             {{-- Desktop User Menu --}}
             <div class="hidden md:flex items-center gap-3">
                 <span class="text-sm text-gray-500">
