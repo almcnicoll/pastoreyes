@@ -75,7 +75,7 @@ plus `app/Actions/ImportPersonFromGoogle.php` and `SyncKeyDateToCalendar.php`:
 ## Scheduled jobs and email
 
 Both scheduled commands (`routes/console.php`) depend on one server cron entry running
-every minute: `* * * * * cd /path-to-project && php artisan schedule:run >> /dev/null 2>&1`.
+every five minutes: `*/5 * * * * cd /path-to-project && php artisan schedule:run >> /dev/null 2>&1`.
 
 - `pastoreyes:sync-contacts` — hourly Google contact sync.
 - `pastoreyes:send-prayer-emails` — every 5 minutes. Each user opts in under Settings →

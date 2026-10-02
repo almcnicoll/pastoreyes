@@ -6,6 +6,7 @@
 --}}
 <div x-data="{ open: false }"
      x-on:keydown.escape.window="open = false; $refs.q.blur()"
+     x-on:keydown.window="if ($event.altKey && $event.code === 'KeyS') { $event.preventDefault(); open = true; $refs.q.focus() }"
      class="ml-auto md:ml-0 xl:relative xl:mx-3">
 
     {{-- Icon (below xl) --}}
@@ -43,6 +44,8 @@
                        autocomplete="off" autocapitalize="off" spellcheck="false"
                        placeholder="Search people…"
                        aria-label="Search people"
+                       aria-keyshortcuts="Alt+S"
+                       title="Search people (Alt+S)"
                        class="w-full border border-gray-300 rounded-lg text-sm pl-9 pr-3 py-2 xl:w-56 focus:ring-indigo-500 focus:border-indigo-500">
             </div>
 

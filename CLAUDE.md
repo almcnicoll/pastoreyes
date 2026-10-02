@@ -51,4 +51,4 @@ On each trigger the Plesk webhook pulls the latest commit, then runs `npm instal
 
 ### Not yet established (ask the user rather than assuming)
 
-- The server cron entry that runs `php artisan schedule:run` every minute (needed for the contact sync and the prayer reminder emails), and a production `APP_URL` that is correct (it is used for the links in emails).
+- The server cron entry that runs `php artisan schedule:run` every five minutes, `*/5 * * * *` (needed for the contact sync and the prayer reminder emails), and a production `APP_URL` that is correct (it is used for the links in emails).

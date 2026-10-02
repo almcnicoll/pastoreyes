@@ -25,7 +25,10 @@ Artisan::command('inspire', function () {
 | cycle for a pastoral care tool.
 |
 | To enable the scheduler on your server, add this cron entry:
-|   * * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1
+|   */5 * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1
+|
+| Missed runs are not caught up, so the interval must divide 60 evenly and
+| include minute 0 (5, 10, 15 or 30), or the hourly contact sync never fires.
 |
 | On Plesk, this can be configured under Scheduled Tasks in the control panel.
 |
