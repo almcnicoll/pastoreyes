@@ -47,8 +47,4 @@ On each trigger the Plesk webhook pulls the latest commit, then runs `npm instal
 
 - **Migrations:** if the deployed commits include new files in `database/migrations/`, tell the user `php artisan migrate` still has to be run on the server (it won't have happened).
 - **Compiled assets:** the webhook doesn't build them, so `public/build` (compiled CSS/JS) is **committed to git** and arrives via the pull. Always run `npm run build` and commit the result before deploying if anything under `resources/` changed — a stale build means new Tailwind classes and JS silently don't exist on the live site. Vite replaces the whole directory on each build (hashed filenames, so old files disappear from git too); commit it all together.
-- **First deploy that includes `public/build`:** the server already has an untracked `public/build` (the site needs it to render), and git refuses to pull when untracked files would be overwritten (`manifest.json` at least). The user must delete the server's `public/build` folder once, before that first deploy. After that it's tracked and needs no manual handling.
-
-### Not yet established (ask the user rather than assuming)
-
-- The server cron entry that runs `php artisan schedule:run` every five minutes, `*/5 * * * *` (needed for the contact sync and the prayer reminder emails), and a production `APP_URL` that is correct (it is used for the links in emails).
+- **Server setup is done:** the server's old `public/build` was cleared, the cron entry (`0-59/5 * * * *` running `php artisan schedule:run`) is in place, and the live `.env` has a correct `APP_URL`. Don't re-raise these in deploy summaries.
