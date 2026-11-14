@@ -227,11 +227,14 @@
                 @if(in_array($editType, ['note', 'prayer_need', 'goal', 'outcome']))
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">
-                        Title <span class="text-gray-400">(optional)</span>
+                        Title @unless(in_array($editType, ['goal', 'outcome']))<span class="text-gray-400">(optional)</span>@endunless
                     </label>
                     <input wire:model="editTitle" type="text"
                            class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"
                            placeholder="Short title...">
+                    @error('editTitle')
+                        <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
                 @endif
 

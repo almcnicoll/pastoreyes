@@ -94,24 +94,24 @@ class QuickAddEntry extends Component
         $this->validate([
             'selectedPersonIds'   => 'required|array|min:1',
             'selectedPersonIds.*' => 'integer|exists:persons,id',
-            'type'        => 'required|in:note,prayer_need,goal,key_date',
+            'type'        => 'required|in:note,prayer_need,goal',
+            // A goal needs a title, as on the person's Goals & Prayer tab; for the others it's optional
+            'title'       => ($this->type === 'goal' ? 'required' : 'nullable') . '|string|max:500',
             'body'        => 'required|string',
             'significance' => 'required|integer|min:1|max:5',
             'date'        => 'required|date',
+            'targetDate'  => 'nullable|date',
         ]);
 
         $entry = match($this->type) {
-            'note'       => $this->saveNote(),
+            'note'        => $this->saveNote(),
             'prayer_need' => $this->savePrayerNeed(),
-            'goal'       => $this->saveGoal(),
-            default      => null,
+            'goal'        => $this->saveGoal(),
         };
 
-        if ($entry) {
-            // First person selected is the primary one (same convention as Timeline::saveEdit)
-            foreach ($this->selectedPersonIds as $i => $personId) {
-                $entry->persons()->attach($personId, ['is_primary' => $i === 0]);
-            }
+        // First person selected is the primary one (same convention as Timeline::saveEdit)
+        foreach ($this->selectedPersonIds as $i => $personId) {
+            $entry->persons()->attach($personId, ['is_primary' => $i === 0]);
         }
 
         $this->reset(['open', 'type', 'selectedPersonIds', 'personSearch', 'personResults', 'title', 'body', 'significance', 'targetDate']);

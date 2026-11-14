@@ -209,6 +209,8 @@ class Timeline extends Component
 
         if (in_array($this->editType, ['note', 'prayer_need', 'goal', 'outcome'])) {
             $rules['editBody'] = 'required|string';
+            // Goals and outcomes need a title, as on the Goals & Prayer tab; notes and prayer needs don't
+            $rules['editTitle'] = (in_array($this->editType, ['goal', 'outcome']) ? 'required' : 'nullable') . '|string|max:500';
         }
 
         if ($this->editType === 'goal') {
@@ -248,7 +250,8 @@ class Timeline extends Component
                 'title'              => $this->editTitle ?: null,
                 'body'               => $this->editBody,
                 'resolved_at'        => $this->editResolvedAt ?: null,
-                'resolution_details' => $this->editResolutionDetails ?: null,
+                // Details only make sense while resolved, so clearing the date clears them
+                'resolution_details' => $this->editResolvedAt ? ($this->editResolutionDetails ?: null) : null,
             ],
             'goal' => [
                 'title'       => $this->editTitle ?: null,
