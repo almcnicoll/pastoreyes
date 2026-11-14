@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Livewire\Concerns\CatchesDbErrors;
 use App\Models\RelationshipType;
 use App\Models\User;
+use App\Services\Google\GoogleClient;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
@@ -96,6 +97,8 @@ class Settings extends Component
             $this->dispatch('notify', message: 'Cannot delete the last administrator.');
             return;
         }
+
+        (new GoogleClient($user))->revokeToken();
 
         Auth::logout();
         $user->delete();
@@ -286,6 +289,8 @@ class Settings extends Component
             $this->dispatch('notify', message: 'Cannot delete the last administrator.');
             return;
         }
+
+        (new GoogleClient($user))->revokeToken();
 
         $user->delete();
 

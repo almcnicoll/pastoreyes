@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Livewire\Concerns\CatchesDbErrors;
 use App\Services\Google\GoogleCalendarService;
+use App\Services\Google\GoogleClient;
 use Livewire\Component;
 
 class GoogleIntegrationSettings extends Component
@@ -51,6 +52,8 @@ class GoogleIntegrationSettings extends Component
 
     public function disconnectGoogle(): void
     {
+        (new GoogleClient(auth()->user()))->revokeToken();
+
         auth()->user()->update([
             'google_oauth_token'         => null,
             'google_oauth_refresh_token' => null,

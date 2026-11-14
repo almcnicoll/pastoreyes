@@ -11,7 +11,7 @@
     <nav class="bg-white border-b border-gray-200 px-4 lg:px-6 py-3">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
             <a href="/" class="flex items-center gap-2">
-                <img src="{{ env('APP_URL') }}/icons/pastoreyes-logo.png" alt="PastorEyes Logo" class="w-8 h-8">
+                <img src="{{ asset('icons/pastoreyes-logo.png') }}" alt="PastorEyes Logo" class="w-8 h-8">
                 <span class="text-xl font-bold text-gray-800 tracking-tight">PastorEyes</span>
             </a>
             <div class="flex items-center gap-2">
@@ -24,7 +24,7 @@
 
     <main class="max-w-7xl mx-auto px-4 lg:px-6 py-12">
         <div class="flex flex-col items-center justify-center text-center py-12">
-            <img src="{{ env('APP_URL') }}/icons/pastoreyes-logo.png" alt="PastorEyes Logo" class="w-20 h-20 mb-6">
+            <img src="{{ asset('icons/pastoreyes-logo.png') }}" alt="PastorEyes Logo" class="w-20 h-20 mb-6">
             <h1 class="text-3xl md:text-4xl font-bold mb-4 max-w-2xl">
                 Remember everyone you care for, and everything that matters to them.
             </h1>
@@ -76,6 +76,26 @@
                 </p>
             </div>
         </div>
+
+        <section id="google-access" class="bg-white rounded-lg border border-gray-200 p-6 my-8">
+            <h2 class="font-semibold text-gray-900 mb-2">What Google access PastorEyes asks for, and why</h2>
+            <p class="text-sm text-gray-600 mb-3">
+                PastorEyes uses Google to sign you in. It also asks permission to work with your Google
+                Contacts and Google Calendar, so you don't have to re-type what you already have:
+            </p>
+            <ul class="list-disc ml-5 text-sm text-gray-600 space-y-1 mb-3">
+                <li><strong>Name and email address</strong> &mdash; to sign you in and create your account.</li>
+                <li><strong>Google Contacts</strong> &mdash; to find and import contacts you choose, to compare linked contacts with your records, and to update a contact only when you choose to push a change to Google.</li>
+                <li><strong>Google Calendar</strong> &mdash; to list your calendars and to add, update and delete the events for key dates (birthdays, anniversaries) that you choose to sync.</li>
+            </ul>
+            <p class="text-sm text-gray-600">
+                PastorEyes's use and transfer to any other app of information received from Google APIs will adhere to the
+                <a href="https://developers.google.com/terms/api-services-user-data-policy#additional_requirements_for_specific_api_scopes" class="underline">Google API Services User Data Policy</a>,
+                including the Limited Use requirements. Google data is used only to provide these features: never for advertising,
+                never sold, and never used to train AI or machine-learning models. You can disconnect Google at any time in Settings.
+                Read our <a href="{{ route('privacy') }}" class="underline">Privacy Policy</a> for the full details.
+            </p>
+        </section>
     </main>
 
     <footer>

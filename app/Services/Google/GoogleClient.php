@@ -144,6 +144,25 @@ class GoogleClient
     }
 
     /**
+     * Revoke the user's grant at Google (revoking the refresh token also kills the access token).
+     * Best effort: callers carry on with local cleanup even if Google can't be reached.
+     */
+    public function revokeToken(): void
+    {
+        $token = $this->user->google_oauth_refresh_token ?: $this->user->google_oauth_token;
+
+        if (empty($token)) {
+            return;
+        }
+
+        try {
+            Http::asForm()->timeout(10)->post('https://oauth2.googleapis.com/revoke', ['token' => $token]);
+        } catch (\Exception $e) {
+            Log::warning('Google token revoke failed for user ' . $this->user->id . ': ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Token needs proactive refresh if it expires within the next 5 minutes,
      * or if no token is stored at all.
      */

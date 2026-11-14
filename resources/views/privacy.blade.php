@@ -83,11 +83,11 @@
 <header>
     <p class="app-name">PastorEyes</p>
     <h1>Privacy Policy</h1>
-    <p class="meta">Last updated: <strong>May 2026</strong> &nbsp;|&nbsp; Applies to: pastoreyes.almcnicoll.co.uk</p>
+    <p class="meta">Last updated: <strong>November 2026</strong> &nbsp;|&nbsp; Applies to: pastoreyes.almcnicoll.co.uk</p>
 </header>
 
 <div class="highlight-box">
-    <strong>Summary for busy readers:</strong> PastorEyes stores personal and sensitive information about third parties on your behalf. All sensitive data is encrypted using a key unique to your account, meaning neither the developer nor anyone with access to the database can read your records. You can delete your account and all associated data at any time by emailing the developer. We do not sell, share, or use your data for any purpose other than operating the service.
+    <strong>Summary for busy readers:</strong> PastorEyes stores personal and sensitive information about third parties on your behalf. All sensitive data is encrypted using a key unique to your account, meaning neither the developer nor anyone with access to the database can read your records. You can delete your account and all associated data at any time by emailing the developer. We do not sell your data, use it for advertising, or use it for any purpose other than operating the service. It is shared only with the services needed to run PastorEyes, listed in section 8.
 </div>
 
 <h2>1. Who We Are</h2>
@@ -102,7 +102,7 @@
     <li>Your name (first and last), as provided by Google</li>
     <li>Your email address</li>
     <li>A Google account identifier, used to recognise you on return visits</li>
-    <li>OAuth access and refresh tokens, which allow the application to access your Google Contacts and Google Calendar on your behalf</li>
+    <li>OAuth access and refresh tokens (stored encrypted), which allow the application to access your Google Contacts and Google Calendar on your behalf until you disconnect Google or delete your account</li>
 </ul>
 <p>Your name is stored in an encrypted form. Your email address is stored unencrypted, as it is required for account look-up at sign-in.</p>
 
@@ -121,13 +121,38 @@
 <p>This data relates to third parties who have not themselves consented to its storage in PastorEyes. As the user, <strong>you are solely responsible for ensuring you have a legitimate purpose for recording this information</strong>, and for handling it in a manner that respects the privacy and dignity of the individuals concerned.</p>
 
 <h3>2.3 Google Integration Data</h3>
-<p>If you link a person's record to a Google Contact, we store a reference identifier for that contact. With your permission (granted during sign-in), the application may:</p>
+<p>When you sign in, Google asks you to allow PastorEyes the access below. Each permission is used only for the feature described next to it.</p>
+
+<p><strong>Sign-in (name, email address, Google account ID).</strong> Used to create and recognise your account (see 2.1).</p>
+
+<p><strong>Google Contacts</strong> (scope: <code>https://www.googleapis.com/auth/contacts</code>):</p>
 <ul>
-    <li>Read contact information from Google Contacts to compare with your local records</li>
-    <li>Write updates back to Google Contacts (only when you explicitly choose to do so)</li>
-    <li>Create, read, and update events in your Google Calendar</li>
+    <li><strong>Searching.</strong> When you use &ldquo;Find in Google Contacts&rdquo; or &ldquo;Add from Google Contacts&rdquo;, PastorEyes searches your contacts by the name you type and shows the matches (names, photos, email addresses and phone numbers) so you can pick one. Email addresses and phone numbers are displayed only; they are not saved in PastorEyes.</li>
+    <li><strong>Importing and linking.</strong> When you import or link a contact, PastorEyes reads that contact and saves its names (including middle name and nickname), photo, addresses, birthday (as a Birthday key date), other dated events such as anniversaries, and gender into the person&rsquo;s PastorEyes record, together with the contact&rsquo;s Google identifier.</li>
+    <li><strong>Background comparison.</strong> Once an hour, for people you have linked to a Google Contact, PastorEyes reads that contact in the background and compares its names, birthday, addresses and photo with your PastorEyes record. Any differences found are saved (encrypted) in a review list until you choose to pull the Google value into PastorEyes, push the PastorEyes value to Google, or ignore it.</li>
+    <li><strong>Writing back.</strong> Only when you choose to push a flagged difference to Google does PastorEyes change that contact&rsquo;s name, birthday or address in Google Contacts. PastorEyes never creates or deletes Google contacts and changes nothing else.</li>
 </ul>
-<p>We do not store the content of your Google contacts beyond what you explicitly import into PastorEyes.</p>
+
+<p><strong>Google Calendar</strong> (scopes: <code>https://www.googleapis.com/auth/calendar.calendarlist.readonly</code> and <code>https://www.googleapis.com/auth/calendar.events</code>):</p>
+<ul>
+    <li><strong>Listing calendars.</strong> PastorEyes lists the calendars you can edit so you can choose where key dates are synced. Calendar names are displayed only; the identifier of the calendar you choose is saved.</li>
+    <li><strong>Creating, updating and deleting events.</strong> When you choose to sync a key date, PastorEyes creates an event in your chosen calendar. The event title is the key date&rsquo;s label or type, and the event description lists the names of the people the key date concerns. PastorEyes updates or deletes that event when you change or delete the key date in PastorEyes, or choose a different calendar. The event&rsquo;s Google identifier is saved.</li>
+    <li><strong>Reading changes back.</strong> When you open a person&rsquo;s page, PastorEyes re-reads the events it created and, if you have changed an event&rsquo;s date or title in Google Calendar, copies that change into the matching key date.</li>
+    <li>PastorEyes does not read, copy or change any other event in your calendars.</li>
+</ul>
+
+<p>PastorEyes does not store any other Google data. Apart from what you import, the only Google contact data it keeps is the Google identifier of linked contacts and the differences saved in the review list described above.</p>
+
+<h3>2.4 Limited Use of Google User Data</h3>
+<p>PastorEyes&rsquo;s use and transfer to any other app of information received from Google APIs will adhere to the <a href="https://developers.google.com/terms/api-services-user-data-policy#additional_requirements_for_specific_api_scopes">Google API Services User Data Policy</a>, including the Limited Use requirements. In particular, for data received from Google Contacts and Google Calendar:</p>
+<ul>
+    <li>We use it only to provide the user-facing features described in section 2.3.</li>
+    <li>We do not transfer it to anyone else, except as necessary to provide those features (see section 8), for security purposes such as investigating abuse or a bug, to comply with the law, or with your explicit consent.</li>
+    <li>We do not use it, or sell it, for advertising (including retargeting, personalised or interest-based advertising), and we do not sell it to data brokers or information resellers.</li>
+    <li>We do not use it to decide credit-worthiness or lending.</li>
+    <li>We do not use it to develop, improve or train generalised artificial intelligence or machine-learning models. PastorEyes does not use AI or machine learning on your data.</li>
+    <li>No human reads it, except where you have given specific permission, where it is necessary for security purposes or to comply with the law, or where the data is aggregated and anonymised for internal operations.</li>
+</ul>
 
 <h2>3. How Your Data Is Protected</h2>
 
@@ -148,7 +173,7 @@
 <p>Under the UK General Data Protection Regulation (UK GDPR) and the Data Protection Act 2018, you have the following rights in relation to your personal data:</p>
 <ul>
     <li><strong>Right of access:</strong> You may request a copy of the personal data we hold about you.</li>
-    <li><strong>Right to erasure:</strong> You may request deletion of your account and all associated data. You can do this yourself within the application, or by emailing the developer. Deletion is permanent and irreversible.</li>
+    <li><strong>Right to erasure:</strong> You may request deletion of your account and all associated data. You can do this yourself within the application, or by emailing the developer. Deletion is permanent and irreversible, and also revokes PastorEyes&rsquo;s access to your Google account.</li>
     <li><strong>Right to rectification:</strong> You may correct your account name and other personal details within the application settings.</li>
     <li><strong>Right to restrict processing:</strong> You may request that we restrict processing of your data in certain circumstances.</li>
     <li><strong>Right to data portability:</strong> PastorEyes includes a data export feature that allows you to download all your data in an encrypted portable format.</li>
@@ -161,13 +186,13 @@
 <ul>
     <li><strong>Contract:</strong> Processing your account data is necessary to provide the service you have signed up for.</li>
     <li><strong>Legitimate interests:</strong> We have a legitimate interest in maintaining the security and integrity of the service.</li>
-    <li><strong>Your explicit consent:</strong> You consent to Google integration at the point of signing in with Google OAuth, and may withdraw this at any time by disconnecting your Google account in Settings.</li>
+    <li><strong>Your explicit consent:</strong> You consent to Google integration at the point of signing in with Google OAuth, and may withdraw this at any time by disconnecting your Google account in Settings (which also revokes PastorEyes&rsquo;s access at Google), or from your Google Account&rsquo;s <a href="https://myaccount.google.com/permissions">third-party access page</a>.</li>
 </ul>
 
 <h2>6. Data We Do Not Collect</h2>
 <ul>
     <li>We do not use cookies for advertising or tracking purposes.</li>
-    <li>We do not share your data with any third parties except Google (for the Google integration features you have authorised).</li>
+    <li>We do not share your data with any third parties other than Google (for the Google integration features you have authorised) and the hosting and email services needed to run PastorEyes, described in section 8.</li>
     <li>We do not use your data, or the data you record about others, for any purpose other than operating the service.</li>
     <li>We do not contact individuals whose information is stored in your PastorEyes records.</li>
     <li>We do not sell data or use it for commercial purposes.</li>
@@ -176,9 +201,12 @@
 <h2>7. Data Retention</h2>
 <p>Your data is retained for as long as your account exists. If you delete your account, all associated data is permanently deleted from the database. Deletion cannot be undone.</p>
 <p>Automated database backups may retain copies of data for a short period after deletion. These backups exist solely for disaster recovery and are not accessible to other users.</p>
+<p>Your Google OAuth tokens are deleted, and revoked at Google, when you disconnect Google in Settings or delete your account. Information you have imported from Google Contacts becomes part of your PastorEyes records and is kept until you delete it or your account. Calendar events that PastorEyes created remain in your Google Calendar after you disconnect or delete your account; delete them in Google Calendar if you no longer want them.</p>
 
 <h2>8. Third-Party Services</h2>
 <p>PastorEyes integrates with Google&rsquo;s services (Google Contacts and Google Calendar). Your use of these features is also governed by Google&rsquo;s own privacy policy, available at <a href="https://policies.google.com/privacy">policies.google.com/privacy</a>.</p>
+<p><strong>Hosting.</strong> PastorEyes runs on a shared hosting server in the United Kingdom, which stores the database and processes all data on our behalf.</p>
+<p><strong>Email delivery.</strong> If you opt in to Prayer Emails (Settings &rarr; Prayer Emails; they are off unless you turn them on), PastorEyes emails the address on your account a list of the people who have active prayer needs, showing their names and a count, with links back to PastorEyes. The email is sent through the email (SMTP) service configured by the administrator, which therefore handles your email address and those names. The names come from your PastorEyes records, which may include names you imported from Google Contacts. You can turn Prayer Emails off at any time.</p>
 <p>No other third-party analytics, advertising, or tracking services are used.</p>
 
 <h2>9. Children</h2>

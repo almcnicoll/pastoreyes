@@ -37,6 +37,20 @@
                 Your data is encrypted and private to your account.
             </p>
 
+            {{-- In-context disclosure shown before Google's consent screen --}}
+            <div class="mb-6 p-4 rounded-lg bg-gray-50 border border-gray-200 text-left text-xs text-gray-600 leading-relaxed">
+                <p class="font-semibold text-gray-700 mb-1">What Google will ask you to allow</p>
+                <ul class="list-disc ml-4 space-y-1">
+                    <li>Your name and email address, to sign you in and create your account.</li>
+                    <li>Google Contacts: to find contacts you choose to link or import, and to update a contact only when you choose to push a change to Google.</li>
+                    <li>Google Calendar: to list your calendars and to add, update and delete the events for key dates you choose to sync.</li>
+                </ul>
+                <p class="mt-2">
+                    We use this data only to provide these features, and never for advertising or AI training.
+                    See our <a href="{{ route('privacy') }}" class="underline">Privacy Policy</a>.
+                </p>
+            </div>
+
             <a href="{{ route('auth.google.redirect') }}"
                class="inline-flex items-center justify-center gap-3 w-full px-6 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 font-medium text-sm hover:bg-gray-50 hover:border-gray-400 transition-colors shadow-sm">
 
@@ -53,18 +67,13 @@
 
         </div>
 
-        <p class="mt-6 text-center text-xs text-gray-400">
-            Access is by invitation only. Contact your administrator if you need an account.
-        </p>
+        <footer class="mt-6 text-center text-xs text-gray-400">
+            &copy; {{ date('Y') }} PastorEyes. All rights reserved. &middot;
+            <a href="{{ route('privacy') }}" class="hover:underline">Privacy Policy</a> &middot;
+            <a href="{{ route('terms') }}" class="hover:underline">Terms of Service</a>
+        </footer>
 
     </div>
 
 </body>
-<footer>
-    <div class="max-w-7xl mx-auto px-4 lg:px-6 py-4 text-center text-xs text-gray-400">
-        © 2026 PastorEyes. All rights reserved. ·
-        <a href="http://localhost/pastoreyes/public/privacy" class="hover:underline">Privacy Policy</a> ·
-        <a href="http://localhost/pastoreyes/public/terms" class="hover:underline">Terms of Service</a>
-    </div>
-</footer>
 </html>
