@@ -231,7 +231,7 @@
                     </label>
                     <input wire:model="editTitle" type="text"
                            class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"
-                           placeholder="Short title...">
+                           placeholder="Brief summary">
                     @error('editTitle')
                         <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
                     @enderror
@@ -241,10 +241,9 @@
                 {{-- Body (note, prayer_need, goal, outcome) --}}
                 @if(in_array($editType, ['note', 'prayer_need', 'goal', 'outcome']))
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Body</label>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Detail</label>
                     <textarea wire:model="editBody" rows="4"
-                              class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"
-                              placeholder="Content..."></textarea>
+                              class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
                     @error('editBody')
                         <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
                     @enderror
@@ -255,7 +254,7 @@
                 @if($editType === 'prayer_need')
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">
-                        Resolved Date <span class="text-gray-400">(optional)</span>
+                        Date Resolved <span class="text-gray-400">(optional)</span>
                     </label>
                     <input wire:model="editResolvedAt" type="date"
                            class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
@@ -270,7 +269,7 @@
                     </label>
                     <textarea wire:model="editResolutionDetails" rows="2"
                               class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"
-                              placeholder="How was this resolved?"></textarea>
+                              placeholder="How was this answered or resolved?"></textarea>
                 </div>
                 @endif
                 @endif
@@ -289,7 +288,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">
-                        Achieved Date <span class="text-gray-400">(optional)</span>
+                        Date Achieved <span class="text-gray-400">(optional)</span>
                     </label>
                     <input wire:model="editAchievedAt" type="date"
                            class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">

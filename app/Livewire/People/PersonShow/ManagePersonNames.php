@@ -104,8 +104,9 @@ class ManagePersonNames extends Component
             }
         }
 
+        $verb = $this->editingId ? 'updated' : 'added';
         $this->resetForm();
-        $this->dispatch('notify', message: 'Name saved.');
+        $this->dispatch('notify', message: "Name {$verb}.");
         $this->dispatch('person-names-updated');
     }
 

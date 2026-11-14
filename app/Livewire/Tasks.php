@@ -118,8 +118,9 @@ class Tasks extends Component
 
         $task->persons()->sync($this->selectedPersonIds);
 
+        $verb = $this->editingId ? 'updated' : 'added';
         $this->resetForm();
-        $this->dispatch('notify', message: 'Task saved.');
+        $this->dispatch('notify', message: "Task {$verb}.");
     }
 
     public function complete(int $id): void

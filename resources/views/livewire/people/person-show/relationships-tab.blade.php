@@ -60,7 +60,7 @@
                     <button wire:click="editRelationship({{ $rel->id }})"
                             class="text-xs text-indigo-600 hover:underline">Edit</button>
                     <button wire:click="deleteRelationship({{ $rel->id }})"
-                            wire:confirm="Remove this relationship?"
+                            wire:confirm="Remove this relationship? Neither person is deleted."
                             class="text-xs text-red-500 hover:underline">Remove</button>
                 </div>
             </div>

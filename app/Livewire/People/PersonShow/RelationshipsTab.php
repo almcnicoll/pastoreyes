@@ -216,9 +216,10 @@ class RelationshipsTab extends Component
             Relationship::create($data);
         }
 
+        $verb = $this->editingRelationshipId ? 'updated' : 'added';
         $this->resetForm();
         $this->dispatch('graph:refresh', graphData: $this->buildGraphData());
-        $this->dispatch('notify', message: 'Relationship saved.');
+        $this->dispatch('notify', message: "Relationship {$verb}.");
     }
 
     public function deleteRelationship(int $relationshipId): void

@@ -114,11 +114,13 @@ class QuickAddEntry extends Component
             $entry->persons()->attach($personId, ['is_primary' => $i === 0]);
         }
 
+        $label = config("entry_types.types.{$this->type}.label");
+
         $this->reset(['open', 'type', 'selectedPersonIds', 'personSearch', 'personResults', 'title', 'body', 'significance', 'targetDate']);
         $this->date = now()->format('Y-m-d');
         $this->significance = 3;
 
-        $this->dispatch('notify', message: 'Entry added.');
+        $this->dispatch('notify', message: "{$label} added.");
         $this->dispatch('timeline-updated');
     }
 

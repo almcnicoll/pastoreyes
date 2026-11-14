@@ -169,12 +169,12 @@ class AddPersonFromGoogle extends Component
             $person = (new ImportPersonFromGoogle())->execute($this->selectedResourceName);
 
             $this->open = false;
-            $this->dispatch('notify', message: 'Contact imported successfully.');
+            $this->dispatch('notify', message: 'Contact imported.');
             $this->redirect(route('people.show', $person), navigate: true);
         } catch (\Exception $e) {
             $this->error    = true;
             $this->importing = false;
-            $this->dispatch('notify', message: 'Import failed: ' . $e->getMessage());
+            $this->dispatch('notify', message: "Couldn't import contact: " . $e->getMessage());
         }
     }
 
@@ -197,7 +197,7 @@ class AddPersonFromGoogle extends Component
             $this->results              = collect();
         } catch (\Exception $e) {
             $this->error = true;
-            $this->dispatch('notify', message: 'Import failed: ' . $e->getMessage());
+            $this->dispatch('notify', message: "Couldn't import contact: " . $e->getMessage());
         }
 
         $this->importing = false;

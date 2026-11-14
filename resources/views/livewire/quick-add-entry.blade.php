@@ -114,12 +114,7 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">
-                            @if($type === 'note') Note
-                            @elseif($type === 'prayer_need') Prayer Need
-                            @elseif($type === 'goal') Detail
-                            @endif
-                        </label>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Detail</label>
                         <textarea wire:model="body" rows="3"
                                   class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
                         @error('body') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror

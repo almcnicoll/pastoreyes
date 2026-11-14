@@ -144,8 +144,9 @@ class GoalsPrayerTab extends Component
             $goal->persons()->attach($this->person->id, ['is_primary' => true]);
         }
 
+        $verb = $this->editingId ? 'updated' : 'added';
         $this->resetForm();
-        $this->dispatch('notify', message: 'Goal saved.');
+        $this->dispatch('notify', message: "Goal {$verb}.");
     }
 
     protected function savePrayer(): void
@@ -175,8 +176,9 @@ class GoalsPrayerTab extends Component
             $need->persons()->attach($this->person->id, ['is_primary' => true]);
         }
 
+        $verb = $this->editingId ? 'updated' : 'added';
         $this->resetForm();
-        $this->dispatch('notify', message: 'Prayer need saved.');
+        $this->dispatch('notify', message: "Prayer Need {$verb}.");
     }
 
     protected function resolveGoal(): void
@@ -228,7 +230,7 @@ class GoalsPrayerTab extends Component
         $need->save();
 
         $this->resetForm();
-        $this->dispatch('notify', message: 'Prayer need resolved.');
+        $this->dispatch('notify', message: 'Prayer Need resolved.');
     }
 
     public function deleteGoal(int $id): void
@@ -244,7 +246,7 @@ class GoalsPrayerTab extends Component
         $need = PrayerNeed::findOrFail($id);
         abort_if($need->user_id !== auth()->id(), 403);
         $need->delete();
-        $this->dispatch('notify', message: 'Prayer need deleted.');
+        $this->dispatch('notify', message: 'Prayer Need deleted.');
     }
 
     public function resetForm(): void

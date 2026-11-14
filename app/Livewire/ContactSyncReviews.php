@@ -26,7 +26,7 @@ class ContactSyncReviews extends Component
             (new ContactSyncResolutionService())->pullToLocal($review);
             $this->dispatch('notify', message: 'Updated in PastorEyes.');
         } catch (\Exception $e) {
-            $this->dispatch('notify', message: 'Failed: ' . $e->getMessage());
+            $this->dispatch('notify', message: "Couldn't update PastorEyes: " . $e->getMessage());
         }
     }
 
@@ -39,7 +39,7 @@ class ContactSyncReviews extends Component
             (new ContactSyncResolutionService())->pushToGoogle($review);
             $this->dispatch('notify', message: 'Pushed to Google Contacts.');
         } catch (\Exception $e) {
-            $this->dispatch('notify', message: 'Failed: ' . $e->getMessage());
+            $this->dispatch('notify', message: "Couldn't push to Google Contacts: " . $e->getMessage());
         }
     }
 

@@ -121,7 +121,7 @@ class DataSettings extends Component
             $this->importPassphrase   = '';
             $this->replaceExisting    = false;
 
-            $this->dispatch('notify', message: 'Import completed successfully.');
+            $this->dispatch('notify', message: 'Data import completed.');
 
         } catch (\Exception $e) {
             $this->importError = $e->getMessage();

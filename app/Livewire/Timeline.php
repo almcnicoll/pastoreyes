@@ -281,8 +281,10 @@ class Timeline extends Component
         }
         $source->persons()->sync($syncData);
 
+        $label = config("entry_types.types.{$this->editType}.label");
+
         $this->cancelEdit();
-        $this->dispatch('notify', message: 'Entry updated.');
+        $this->dispatch('notify', message: "{$label} updated.");
         $this->dispatch('timeline-updated');
     }
 

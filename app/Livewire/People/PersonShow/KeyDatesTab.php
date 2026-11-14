@@ -101,8 +101,9 @@ class KeyDatesTab extends Component
             $this->dispatch('sync-key-date-to-calendar', keyDateId: $kd->id, calendarId: $this->googleCalendarId);
         }
 
+        $verb = $this->editingId ? 'updated' : 'added';
         $this->resetForm();
-        $this->dispatch('notify', message: 'Key date saved.');
+        $this->dispatch('notify', message: "Key Date {$verb}.");
     }
 
     public function delete(int $id): void
@@ -110,7 +111,7 @@ class KeyDatesTab extends Component
         $kd = KeyDate::findOrFail($id);
         abort_if($kd->user_id !== auth()->id(), 403);
         $kd->delete();
-        $this->dispatch('notify', message: 'Key date deleted.');
+        $this->dispatch('notify', message: 'Key Date deleted.');
     }
 
     public function syncNow(int $id): void

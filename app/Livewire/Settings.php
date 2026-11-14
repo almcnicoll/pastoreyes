@@ -93,7 +93,7 @@ class Settings extends Component
 
         // Prevent deleting the last admin
         if ($user->is_admin && User::where('is_admin', true)->count() <= 1) {
-            $this->dispatch('notify', message: 'Cannot delete the last administrator account.');
+            $this->dispatch('notify', message: 'Cannot delete the last administrator.');
             return;
         }
 
@@ -181,8 +181,9 @@ class Settings extends Component
             RelationshipType::create($data);
         }
 
+        $verb = $this->editingRelTypeId ? 'updated' : 'added';
         $this->resetRelTypeForm();
-        $this->dispatch('notify', message: 'Relationship type saved.');
+        $this->dispatch('notify', message: "Relationship type {$verb}.");
     }
 
     public function deleteRelType(int $id): void
