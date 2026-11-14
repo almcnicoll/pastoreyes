@@ -1,10 +1,10 @@
-<p>These people have outstanding prayer requests:</p>
+<p>These people have active prayer needs:</p>
 
 <ul>
 @foreach($people as $person)
     <li>
         <a href="{{ route('people.show', ['person' => $person->id, 'tab' => 'goals_prayer']) }}">{{ $person->display_name }}</a>
-        — {{ $person->outstanding }} outstanding {{ \Illuminate\Support\Str::plural('prayer request', $person->outstanding) }}
+        — {{ $person->outstanding }} active {{ \Illuminate\Support\Str::plural('prayer need', $person->outstanding) }}
     </li>
 @endforeach
 </ul>

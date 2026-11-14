@@ -1,7 +1,7 @@
 <div class="max-w-lg">
-    <h3 class="text-sm font-semibold text-gray-700 mb-1">Prayer Request Reminders</h3>
+    <h3 class="text-sm font-semibold text-gray-700 mb-1">Prayer Need Reminders</h3>
     <p class="text-xs text-gray-400 mb-4 leading-relaxed">
-        Get an email listing the people who have outstanding prayer requests, with a link to each person's
+        Get an email listing the people who have active prayer needs, with a link to each person's
         Goals &amp; Prayer tab. Only names and counts are emailed, never the requests themselves. People are spread
         evenly across the days you choose, to {{ auth()->user()->email }}.
     </p>
@@ -9,7 +9,7 @@
     <form wire:submit="save" class="space-y-4">
         <label class="inline-flex items-center gap-2 text-sm text-gray-700">
             <input wire:model.live="enabled" type="checkbox" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-            Send me prayer request reminders
+            Send me prayer need reminders
         </label>
 
         @if($enabled)

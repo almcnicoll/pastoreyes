@@ -44,11 +44,11 @@
             @endforelse
         </div>
 
-        {{-- Unresolved Prayer Needs --}}
+        {{-- Active Prayer Needs --}}
         <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
             <h2 class="text-base font-semibold text-gray-700 mb-4 flex items-center gap-2">
                 <x-entry-type-badge type="prayer_need" />
-                Unresolved Prayer Needs
+                Active Prayer Needs
             </h2>
 
             @forelse($unresolvedPrayerNeeds as $need)
@@ -65,7 +65,7 @@
                     </div>
                 </div>
             @empty
-                <p class="text-sm text-gray-400 py-2">No unresolved prayer needs.</p>
+                <p class="text-sm text-gray-400 py-2">No active prayer needs.</p>
             @endforelse
 
             @if($unresolvedPrayerNeeds->count() >= 5)

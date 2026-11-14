@@ -15,7 +15,7 @@ class SendPrayerEmails extends Command
                             {--user= : Only process a specific user by ID}
                             {--force : Send today\'s email now, ignoring the configured time and any earlier send today}';
 
-    protected $description = 'Email each user the people with outstanding prayer requests who are due today';
+    protected $description = 'Email each user the people with active prayer needs who are due today';
 
     public function handle(PrayerEmailScheduler $scheduler): int
     {

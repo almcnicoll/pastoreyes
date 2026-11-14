@@ -94,7 +94,7 @@ every five minutes: `*/5 * * * * cd /path-to-project && php artisan schedule:run
 - `pastoreyes:sync-contacts` — hourly Google contact sync.
 - `pastoreyes:send-prayer-emails` — every 5 minutes. Each user opts in under Settings →
   Prayer Emails (days, time of day, timezone, stored in `users.settings['prayer_email']`).
-  People with outstanding prayer requests are spread evenly across the user's chosen days
+  People with active prayer needs are spread evenly across the user's chosen days
   (`prayer_email_assignments`, balanced by `PrayerEmailScheduler::balance`, moving as few
   people as possible). The email lists names and counts only, linking to
   `/people/{id}?tab=goals_prayer` — so `APP_URL` must be correct in production.

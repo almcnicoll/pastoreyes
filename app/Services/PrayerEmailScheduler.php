@@ -18,7 +18,7 @@ class PrayerEmailScheduler
      * Spread people evenly over the selected days, moving as few people as possible.
      *
      * @param array<int,int> $current   personId => day, as currently stored
-     * @param int[]          $personIds people who have outstanding prayer requests
+     * @param int[]          $personIds people who have active prayer needs
      * @param int[]          $days      selected ISO weekdays
      * @return array<int,int>           personId => day
      */
@@ -118,7 +118,7 @@ class PrayerEmailScheduler
 
     /**
      * Re-evaluate the stored day assignments for a user against their selected days
-     * and their people with outstanding prayer requests.
+     * and their people with active prayer needs.
      */
     public function rebalance(User $user): void
     {
@@ -151,7 +151,7 @@ class PrayerEmailScheduler
         });
     }
 
-    /** People assigned to $day, with their outstanding prayer request count. */
+    /** People assigned to $day, with their active prayer need count. */
     public function peopleForDay(User $user, int $day)
     {
         $ids = DB::table('prayer_email_assignments')
