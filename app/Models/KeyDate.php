@@ -28,6 +28,13 @@ class KeyDate extends Model
         'google_calendar_id',
     ];
 
+    public const TYPES = [
+        'birthday'            => 'Birthday',
+        'wedding_anniversary' => 'Wedding Anniversary',
+        'bereavement'         => 'Bereavement',
+        'other'               => 'Other',
+    ];
+
     protected function casts(): array
     {
         return [
@@ -38,6 +45,17 @@ class KeyDate extends Model
             'is_recurring' => 'boolean',
             'significance' => 'integer',
         ];
+    }
+
+    public function getTypeLabelAttribute(): string
+    {
+        return self::TYPES[$this->type] ?? ucfirst(str_replace('_', ' ', (string) $this->type));
+    }
+
+    /** What to call this key date in lists: its custom label, else its type. */
+    public function getDisplayTitleAttribute(): string
+    {
+        return $this->label ?: $this->type_label;
     }
 
     /**

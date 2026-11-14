@@ -25,6 +25,15 @@
                     {{ $config['label'] }}
                 </button>
             @endforeach
+
+            <button wire:click="toggleActiveOnly"
+                    title="Hide resolved prayer needs and achieved goals"
+                    class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border transition-colors
+                        {{ $activeOnly
+                            ? 'bg-gray-700 text-white border-gray-700'
+                            : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300' }}">
+                Active only
+            </button>
         </div>
 
         {{-- Significance + Date filters --}}
@@ -62,7 +71,7 @@
             </button>
 
             {{-- Clear filters --}}
-            @if(!empty($filterTypes) || !empty($filterSignificance) || $dateFrom || $dateTo)
+            @if(!empty($filterTypes) || $activeOnly || !empty($filterSignificance) || $dateFrom || $dateTo)
                 <button wire:click="clearFilters"
                         class="text-xs text-red-400 hover:text-red-600 transition-colors">
                     Clear filters
@@ -98,8 +107,9 @@
                             @foreach($source->persons as $person)
                                 <x-person-name :person="$person" size="sm" />
                             @endforeach
-                            @if($source->title)
-                                <span class="text-xs text-gray-500 truncate">— {{ $source->title }}</span>
+                            @php $rowTitle = $entry->type === 'key_date' ? $source->display_title : $source->title; @endphp
+                            @if($rowTitle)
+                                <span class="text-xs text-gray-500 truncate">— {{ $rowTitle }}</span>
                             @endif
                         </div>
                         <p class="text-xs text-gray-400 mt-0.5">
@@ -132,18 +142,32 @@
                         @endif
                     @endif
 
-                    @if($entry->type === 'goal' && $source->achieved_at)
-                        <p class="text-xs text-green-600">
-                            Achieved {{ $source->achieved_at->format('j M Y') }}
-                        </p>
+                    @if($entry->type === 'goal')
+                        @if($source->target_date)
+                            <p class="text-xs text-gray-500 mb-1">Target: {{ $source->target_date->format('j M Y') }}</p>
+                        @endif
+                        @if($source->outcomes->count())
+                            <p class="text-xs text-gray-500 mb-1">
+                                {{ $source->outcomes->count() }} {{ Str::plural('outcome', $source->outcomes->count()) }}
+                            </p>
+                        @endif
+                        @if($source->achieved_at)
+                            <p class="text-xs text-green-600">
+                                Achieved {{ $source->achieved_at->format('j M Y') }}
+                            </p>
+                        @endif
                     @endif
 
-                    {{-- Link to full record --}}
-                    @if($source->persons->isNotEmpty())
-                        <a href="{{ route('people.show', $source->persons->first()) }}"
-                           class="mt-2 inline-block text-xs text-indigo-600 hover:underline">
-                            View person profile →
-                        </a>
+                    @if($entry->type === 'outcome' && $source->goal)
+                        <p class="text-xs text-gray-500 mb-1">Outcome of the goal: {{ $source->goal->title }}</p>
+                    @endif
+
+                    @if($entry->type === 'key_date')
+                        <p class="text-xs text-gray-500">
+                            {{ $source->type_label }}
+                            · {{ $source->is_recurring ? 'Recurring annually' : 'One-off' }}
+                            @if($source->year_unknown) · Year unknown @endif
+                        </p>
                     @endif
 
                     {{-- Edit button --}}
@@ -160,7 +184,7 @@
         @empty
             <div class="text-center py-12 text-gray-400">
                 <p class="text-sm">No entries found.</p>
-                @if(!empty($filterTypes) || !empty($filterSignificance) || $dateFrom || $dateTo)
+                @if(!empty($filterTypes) || $activeOnly || !empty($filterSignificance) || $dateFrom || $dateTo)
                     <button wire:click="clearFilters" class="mt-2 text-indigo-600 text-xs hover:underline">
                         Clear filters
                     </button>

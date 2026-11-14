@@ -88,6 +88,20 @@ class TimelineEntry extends Model
     }
 
     /**
+     * Hide closed items: resolved prayer needs and achieved goals. Other entry types are unaffected.
+     */
+    public function scopeActiveOnly($query)
+    {
+        return $query->where(function ($q) {
+            $q->whereNotIn('type', ['prayer_need', 'goal'])
+                ->orWhere(fn($q) => $q->where('type', 'prayer_need')
+                    ->whereIn('entryable_id', \App\Models\PrayerNeed::unresolved()->select('id')))
+                ->orWhere(fn($q) => $q->where('type', 'goal')
+                    ->whereIn('entryable_id', \App\Models\Goal::active()->select('id')));
+        });
+    }
+
+    /**
      * Scope to entries at or above a minimum significance level.
      */
     public function scopeMinSignificance($query, int $min)

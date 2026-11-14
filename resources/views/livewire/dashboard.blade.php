@@ -69,7 +69,7 @@
             @endforelse
 
             @if($unresolvedPrayerNeeds->count() >= 5)
-                <a href="{{ route('timeline') }}?type=prayer_need&resolved=0"
+                <a href="{{ route('timeline', ['type' => ['prayer_need'], 'active' => 1]) }}"
                    class="mt-3 block text-xs text-indigo-600 hover:underline">
                     View all →
                 </a>

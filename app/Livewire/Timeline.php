@@ -10,6 +10,7 @@ use App\Models\Person;
 use App\Models\PrayerNeed;
 use App\Models\TimelineEntry;
 use Illuminate\Support\Collection;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 class Timeline extends Component
@@ -17,8 +18,11 @@ class Timeline extends Component
     // Optional: if set, timeline is scoped to a single person
     public ?int $personId = null;
 
-    // Filters
+    // Filters (types and active-only are URL-bound so other pages can link to a filtered Timeline)
+    #[Url(as: 'type')]
     public array $filterTypes = [];
+    #[Url(as: 'active')]
+    public bool $activeOnly = false;
     public array $filterSignificance = [];
     public ?string $dateFrom = null;
     public ?string $dateTo = null;
@@ -65,6 +69,9 @@ class Timeline extends Component
     public function mount(?int $personId = null): void
     {
         $this->personId = $personId;
+
+        // Ignore anything in the URL that isn't a real entry type
+        $this->filterTypes = array_values(array_intersect($this->filterTypes, array_keys(config('entry_types.types'))));
     }
 
     public function toggleSort(): void
@@ -81,6 +88,11 @@ class Timeline extends Component
         }
     }
 
+    public function toggleActiveOnly(): void
+    {
+        $this->activeOnly = !$this->activeOnly;
+    }
+
     public function toggleSignificance(int $sig): void
     {
         if (in_array($sig, $this->filterSignificance)) {
@@ -93,6 +105,7 @@ class Timeline extends Component
     public function clearFilters(): void
     {
         $this->filterTypes        = [];
+        $this->activeOnly         = false;
         $this->filterSignificance = [];
         $this->dateFrom           = null;
         $this->dateTo             = null;
@@ -335,6 +348,10 @@ class Timeline extends Component
 
         if (!empty($this->filterTypes)) {
             $query->ofType($this->filterTypes);
+        }
+
+        if ($this->activeOnly) {
+            $query->activeOnly();
         }
 
         if (!empty($this->filterSignificance)) {
