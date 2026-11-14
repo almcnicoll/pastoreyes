@@ -393,6 +393,16 @@
                             class="px-4 py-2 border border-gray-300 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors">
                         Cancel
                     </button>
+                    @php
+                        $deleteLabel = strtolower(config('entry_types.types')[$editType]['label'] ?? 'entry');
+                        $deleteWarning = 'Delete this ' . $deleteLabel
+                            . (count($editSelectedPersonIds) > 1 ? ' from all ' . count($editSelectedPersonIds) . ' people it is linked to' : '')
+                            . '?' . ($editType === 'goal' ? ' Its outcomes are deleted too.' : '') . ' This cannot be undone.';
+                    @endphp
+                    <button type="button" wire:click="deleteEntry" wire:confirm="{{ $deleteWarning }}"
+                            class="ml-auto px-4 py-2 text-red-600 text-sm font-medium rounded-lg hover:bg-red-50 transition-colors">
+                        Delete
+                    </button>
                 </div>
 
             </form>

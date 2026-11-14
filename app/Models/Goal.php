@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Casts\EncryptedCast;
+use App\Models\Concerns\DetachesPersonsOnDelete;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class Goal extends Model
 {
-    use HasFactory;
+    use HasFactory, DetachesPersonsOnDelete;
 
     protected $fillable = [
         'user_id',
@@ -77,6 +78,12 @@ class Goal extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    protected static function booted(): void
+    {
+        // The database cascades outcome rows, but that skips model events, so their person links would be left behind
+        static::deleting(fn(Goal $goal) => $goal->outcomes->each->delete());
     }
 
     public function outcomes(): HasMany

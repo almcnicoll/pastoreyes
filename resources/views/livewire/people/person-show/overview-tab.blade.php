@@ -268,6 +268,15 @@
         </div>
         @endif
 
+        {{-- Delete person --}}
+        <div class="pt-4 border-t border-gray-100">
+            <button wire:click="deletePerson"
+                    wire:confirm="Permanently delete {{ $person->display_name }}? Their names, addresses, photo, relationships and key dates are removed, along with any entries that are only about them. Entries shared with other people are kept. Tasks are kept but unlinked. Their Google contact is not changed. This cannot be undone."
+                    class="text-xs text-red-500 hover:text-red-700 hover:underline">
+                Delete this person
+            </button>
+        </div>
+
     </div>
     @endif
 

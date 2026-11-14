@@ -159,6 +159,9 @@
     {{-- Toast Notifications --}}
     <div
         x-data="{ show: false, message: '' }"
+        @if(session('notify'))
+        x-init="message = @js(session('notify')); show = true; setTimeout(() => show = false, 3000)"
+        @endif
         x-on:notify.window="message = $event.detail.message; show = true; setTimeout(() => show = false, 3000)"
         x-show="show"
         x-transition:enter="transition ease-out duration-200"

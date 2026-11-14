@@ -6,6 +6,7 @@ use App\Models\KeyDate;
 use App\Models\Person;
 use App\Models\PersonName;
 use App\Models\PersonPhoto;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -177,6 +178,31 @@ class OverviewTab extends Component
         $this->person->refresh()->load(['names', 'addresses', 'photo']);
         $this->editing = false;
         $this->dispatch('notify', message: 'Profile updated.');
+    }
+
+    /**
+     * Delete this person. Entries only about them go too; entries shared with other people
+     * stay (the person_entry row cascades). Tasks are kept, just unlinked.
+     */
+    public function deletePerson()
+    {
+        abort_if($this->person->user_id !== auth()->id(), 403);
+
+        $name = $this->person->display_name;
+
+        DB::transaction(function () {
+            foreach (['notes', 'prayerNeeds', 'goals', 'outcomes', 'keyDates'] as $relation) {
+                $this->person->$relation()->get()
+                    ->filter(fn($entry) => $entry->persons()->count() === 1)
+                    ->each->delete();
+            }
+
+            $this->person->delete();
+        });
+
+        session()->flash('notify', "{$name} deleted.");
+
+        return $this->redirectRoute('people.index');
     }
 
     protected function saveBirthday(): void

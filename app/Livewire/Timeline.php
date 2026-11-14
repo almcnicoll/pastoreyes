@@ -170,6 +170,36 @@ class Timeline extends Component
         $this->editPersonResults  = collect();
     }
 
+    /** The model behind the entry being edited, or null if it isn't the current user's. */
+    protected function editSource()
+    {
+        $source = match($this->editType) {
+            'note'        => Note::find($this->editSourceId),
+            'prayer_need' => PrayerNeed::find($this->editSourceId),
+            'goal'        => Goal::find($this->editSourceId),
+            'outcome'     => Outcome::find($this->editSourceId),
+            'key_date'    => KeyDate::find($this->editSourceId),
+            default       => null,
+        };
+
+        return $source && $source->user_id === auth()->id() ? $source : null;
+    }
+
+    public function deleteEntry(): void
+    {
+        $source = $this->editSource();
+        if (!$source) {
+            return;
+        }
+
+        $label = config("entry_types.types.{$this->editType}.label");
+        $source->delete();
+
+        $this->cancelEdit();
+        $this->dispatch('notify', message: "{$label} deleted.");
+        $this->dispatch('timeline-updated');
+    }
+
     public function saveEdit(): void
     {
         $rules = [
@@ -198,16 +228,9 @@ class Timeline extends Component
 
         $this->validate($rules);
 
-        $source = match($this->editType) {
-            'note'        => Note::find($this->editSourceId),
-            'prayer_need' => PrayerNeed::find($this->editSourceId),
-            'goal'        => Goal::find($this->editSourceId),
-            'outcome'     => Outcome::find($this->editSourceId),
-            'key_date'    => KeyDate::find($this->editSourceId),
-            default       => null,
-        };
+        $source = $this->editSource();
 
-        if (!$source || $source->user_id !== auth()->id()) {
+        if (!$source) {
             return;
         }
 

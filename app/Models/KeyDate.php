@@ -3,14 +3,17 @@
 namespace App\Models;
 
 use App\Casts\EncryptedCast;
+use App\Models\Concerns\DetachesPersonsOnDelete;
+use App\Services\Google\GoogleCalendarService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Support\Facades\Log;
 
 class KeyDate extends Model
 {
-    use HasFactory;
+    use HasFactory, DetachesPersonsOnDelete;
 
     protected $fillable = [
         'user_id',
@@ -95,6 +98,21 @@ class KeyDate extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    protected static function booted(): void
+    {
+        // Remove the synced Google Calendar event too, or it recurs forever; never block the delete on Google
+        static::deleting(function (KeyDate $keyDate) {
+            if (!$keyDate->google_calendar_event_id || !$keyDate->user) {
+                return;
+            }
+            try {
+                (new GoogleCalendarService($keyDate->user))->deleteEvent($keyDate);
+            } catch (\Throwable $e) {
+                Log::warning("Could not delete Google Calendar event for key date {$keyDate->id}: " . $e->getMessage());
+            }
+        });
     }
 
     public function persons(): MorphToMany
