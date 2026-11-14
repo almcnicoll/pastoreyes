@@ -32,12 +32,26 @@ Eloquent casts rather than in controller/view code.
 | `RelationshipType` | Preset or user-defined relationship labels (e.g. "father of" / inverse "son of"), flagged directional or not. |
 | `Relationship` | Links two `Person` records via a `RelationshipType`; directional types resolve to the correct label depending on which end you view from (`Relationship::labelForPerson`). |
 | `Note` | Dated, free-text record of a meeting/event, with a significance rating. |
+| `PrayerNeed` | A prayer need for one or more people; open until resolved (`resolved_at`), with optional resolution details. |
 | `Goal` / `Outcome` | Mentoring goals and their outcomes, dated and rated for significance. |
 | `KeyDate` | Birthdays (year optional), anniversaries, etc. Recurring by default or one-off; can sync to Google Calendar. |
 | `PersonPhoto` | Photo attached to a person. |
 | `Task` | Follow-up/to-do items. |
 | `ContactSyncState` / `ContactSyncReview` | Track Google Contacts import/sync state and surface conflicts for manual review. |
 | `TimelineEntry` | A DB view unifying notes/goals/outcomes/key dates into one chronological, filterable feed (see `2024_01_01_000013_create_timeline_entries_view.php`). |
+
+## Terminology
+
+Use these terms consistently in UI text, messages and docs.
+
+- **Entry** — the general term for anything on the Timeline: a **Note**, **Prayer Need**, **Goal**, **Outcome** or **Key Date**
+  (`config/entry_types.php`). An entry can be linked to several people. The Dashboard lists *Recent Entries*.
+- **Timeline** — the chronological list of entries (the page, and a tab on each person).
+- **Note** — only the single entry type. A person's free-text field is **About**; names and relationships have their
+  own scoped **Notes** field.
+- **Prayer Need** — never "prayer request". The database and code keep `prayer_need` / `PrayerNeed`.
+- **Open / closed words** — Prayer Needs and Goals: *Active* / *Resolved*; Tasks: *Active* / *Completed*;
+  contact sync differences: *Pending* / *Resolved*.
 
 ## Encryption at rest
 

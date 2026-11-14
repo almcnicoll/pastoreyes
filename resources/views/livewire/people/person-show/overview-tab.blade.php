@@ -137,10 +137,10 @@
             </div>
 
             <div class="mt-3">
-                <label class="block text-xs font-medium text-gray-600 mb-1">General Notes</label>
+                <label class="block text-xs font-medium text-gray-600 mb-1">About</label>
                 <textarea wire:model="notes" rows="4"
                           class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"
-                          placeholder="General notes about this person..."></textarea>
+                          placeholder="Background, context, anything worth remembering about this person..."></textarea>
             </div>
         </div>
 
@@ -260,10 +260,10 @@
             @endif
         </div>
 
-        {{-- General Notes --}}
+        {{-- About (free text on the person; not a Note entry) --}}
         @if($person->notes)
         <div>
-            <p class="text-xs text-gray-400 mb-2">Notes</p>
+            <p class="text-xs text-gray-400 mb-2">About</p>
             <p class="text-sm text-gray-700 whitespace-pre-wrap">{{ $person->notes }}</p>
         </div>
         @endif

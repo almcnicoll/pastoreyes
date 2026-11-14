@@ -67,7 +67,7 @@ class Dashboard extends Component
     /**
      * Most recently logged timeline entries across all people.
      */
-    public function getRecentActivityProperty(): Collection
+    public function getRecentEntriesProperty(): Collection
     {
         return TimelineEntry::forUser(auth()->id())
             ->orderByDesc('logged_at')
@@ -119,7 +119,7 @@ class Dashboard extends Component
             'upcomingKeyDates'      => $this->upcoming_key_dates,
             'unresolvedPrayerNeeds' => $this->unresolved_prayer_needs,
             'approachingGoals'      => $this->approaching_goals,
-            'recentActivity'        => $this->recent_activity,
+            'recentEntries'         => $this->recent_entries,
             'highSignificance'      => $this->high_significance,
             'upcomingTasks'         => $this->upcoming_tasks,
         ])->layout('layouts.app', ['title' => 'Dashboard — PastorEyes']);

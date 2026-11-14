@@ -170,11 +170,11 @@
             @endforelse
         </div>
 
-        {{-- Recent Activity --}}
+        {{-- Recent Entries --}}
         <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-            <h2 class="text-base font-semibold text-gray-700 mb-4">Recent Activity</h2>
+            <h2 class="text-base font-semibold text-gray-700 mb-4">Recent Entries</h2>
 
-            @forelse($recentActivity as $item)
+            @forelse($recentEntries as $item)
                 @php $source = $item['source']; $entry = $item['entry']; @endphp
                 <div class="flex items-start gap-3 py-2 border-b border-gray-50 last:border-0">
                     <x-entry-type-badge :type="$entry->type" />
@@ -192,7 +192,7 @@
                     </div>
                 </div>
             @empty
-                <p class="text-sm text-gray-400 py-2">No recent activity.</p>
+                <p class="text-sm text-gray-400 py-2">No recent entries.</p>
             @endforelse
         </div>
 

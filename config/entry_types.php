@@ -7,7 +7,8 @@ return [
     | Entry Types
     |--------------------------------------------------------------------------
     |
-    | Single source of truth for all timeline entry types.
+    | Single source of truth for all timeline entry types. "Entry" is the umbrella term for
+    | any of these; "Note" is only the first type below (see Terminology in doc/architecture.md).
     | Each type has a key matching the 'type' discriminator in the
     | timeline_entries view, a display label, a colour (as a hex value
     | for use in both CSS and PHP), and an icon filename (PNG, supplied
