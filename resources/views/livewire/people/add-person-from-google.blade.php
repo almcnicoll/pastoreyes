@@ -21,7 +21,7 @@
                         </button>
                     @endif
                     <h2 class="text-base font-semibold text-gray-800">
-                        {{ $preview ? 'Confirm Import' : 'Add from Google Contacts' }}
+                        Add from Google Contacts
                     </h2>
                 </div>
                 <button wire:click="closeModal" class="text-gray-400 hover:text-gray-600">
@@ -168,8 +168,8 @@
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
                         </svg>
-                        <span wire:loading.remove wire:target="import">Import Contact</span>
-                        <span wire:loading wire:target="import">Importing...</span>
+                        <span wire:loading.remove wire:target="import">Add person</span>
+                        <span wire:loading wire:target="import">Adding...</span>
                     </button>
                     <button wire:click="importAndAddAnother"
                             wire:loading.attr="disabled"
@@ -178,8 +178,8 @@
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
                         </svg>
-                        <span wire:loading.remove wire:target="importAndAddAnother">Import + Add Another</span>
-                        <span wire:loading wire:target="importAndAddAnother">Importing...</span>
+                        <span wire:loading.remove wire:target="importAndAddAnother">Add person + add another</span>
+                        <span wire:loading wire:target="importAndAddAnother">Adding...</span>
                     </button>
                     <button wire:click="back"
                             class="px-4 py-2 border border-gray-300 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors">

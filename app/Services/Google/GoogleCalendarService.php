@@ -188,7 +188,8 @@ class GoogleCalendarService
         ];
 
         if ($keyDate->is_recurring) {
-            $event['recurrence'] = ['RRULE:FREQ=YEARLY'];
+            // A limited run counts the original date plus N anniversaries
+            $event['recurrence'] = ['RRULE:FREQ=YEARLY' . ($keyDate->recurrence_count && !$keyDate->year_unknown ? ';COUNT=' . ($keyDate->recurrence_count + 1) : '')];
         }
 
         return $event;

@@ -26,7 +26,7 @@
                             @endforeach
                         </div>
                         <p class="text-xs text-gray-500 mt-0.5">
-                            {{ $keyDate->label ?? ucfirst(str_replace('_', ' ', $keyDate->type)) }}
+                            {{ $keyDate->display_title }}
                         </p>
                     </div>
                     <span class="text-xs text-gray-400 whitespace-nowrap">

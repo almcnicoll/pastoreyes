@@ -165,7 +165,7 @@
                     @if($entry->type === 'key_date')
                         <p class="text-xs text-gray-500">
                             {{ $source->type_label }}
-                            · {{ $source->is_recurring ? 'Recurring annually' : 'One-off' }}
+                            · {{ $source->is_recurring ? 'Recurring annually' . ($source->recurrence_count ? " for {$source->recurrence_count} years" : '') : 'One-off' }}
                             @if($source->year_unknown) · Year unknown @endif
                         </p>
                     @endif
@@ -318,10 +318,9 @@
                     <label class="block text-xs font-medium text-gray-600 mb-1">Date Type</label>
                     <select wire:model="editKeyDateType"
                             class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="birthday">Birthday</option>
-                        <option value="wedding_anniversary">Wedding Anniversary</option>
-                        <option value="bereavement">Bereavement</option>
-                        <option value="other">Other</option>
+                        @foreach(\App\Models\KeyDate::TYPES as $value => $typeLabel)
+                            <option value="{{ $value }}">{{ $typeLabel }}</option>
+                        @endforeach
                     </select>
                     @error('editKeyDateType')
                         <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
@@ -358,46 +357,8 @@
                         Related People <span class="text-gray-400">(optional)</span>
                     </label>
 
-                    {{-- Selected people chips --}}
-                    @if(count($editSelectedPersonIds))
-                        <div class="flex flex-wrap gap-2 mb-2">
-                            @foreach($editSelectedPersons as $person)
-                                <span class="inline-flex items-center gap-1 px-2 py-1 bg-indigo-50 text-indigo-700 text-xs rounded-full">
-                                    {{ $person->display_name }}
-                                    <button type="button" wire:click="removeEditPerson({{ $person->id }})"
-                                            class="text-indigo-400 hover:text-indigo-600">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                        </svg>
-                                    </button>
-                                </span>
-                            @endforeach
-                        </div>
-                    @endif
-
-                    {{-- Person search --}}
-                    <div class="relative">
-                        <input wire:model.live.debounce.200ms="editPersonSearch"
-                               type="text"
-                               placeholder="Search to add a person..."
-                               class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"
-                               autocomplete="off">
-
-                        @if($editPersonResults && $editPersonResults->isNotEmpty())
-                            <div class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto">
-                                @foreach($editPersonResults as $person)
-                                    <button type="button"
-                                            wire:click="addEditPerson({{ $person->id }})"
-                                            class="w-full text-left px-3 py-2 text-sm hover:bg-indigo-50 transition-colors">
-                                        <span style="color: {{ config('entry_types.gender_colors')[$person->gender ?? 'unknown'] }}"
-                                              class="font-medium">
-                                            {{ $person->display_name }}
-                                        </span>
-                                    </button>
-                                @endforeach
-                            </div>
-                        @endif
-                    </div>
+                    <livewire:person-picker mode="multi" wire:model="editSelectedPersonIds"
+                                            :key="'timeline-edit-people-'.$editingEntryId" />
                 </div>
 
                 <div class="flex gap-3 pt-1">

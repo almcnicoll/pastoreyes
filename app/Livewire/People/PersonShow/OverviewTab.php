@@ -19,13 +19,16 @@ class OverviewTab extends Component
 
     // Person fields
     public ?string $gender = null;
-    public ?string $date_of_death = null;
     public ?string $notes = null;
 
     // Birthday — stored as a KeyDate, not on Person
     public ?int $birthdayKeyDateId = null;
     public ?string $birthday = null;
     public bool $birthdayYearUnknown = false;
+
+    // Death — also a KeyDate (type 'death', a memorial for its first three anniversaries)
+    public ?int $deathKeyDateId = null;
+    public ?string $deathDate = null;
 
     // Primary name fields
     public ?int $primaryNameId = null;
@@ -49,9 +52,6 @@ class OverviewTab extends Component
     public function resetForm(): void
     {
         $this->gender      = $this->person->gender;
-        $this->date_of_death = $this->person->date_of_death
-            ? \Carbon\Carbon::parse($this->person->date_of_death)->format('Y-m-d')
-            : null;
         $this->notes       = $this->person->notes;
 
         // Load birthday from KeyDate
@@ -65,6 +65,10 @@ class OverviewTab extends Component
             $this->birthday           = null;
             $this->birthdayYearUnknown = false;
         }
+
+        $deathKd = $this->person->keyDates()->where('type', 'death')->first();
+        $this->deathKeyDateId = $deathKd?->id;
+        $this->deathDate      = $deathKd?->date->format('Y-m-d');
 
         // Load primary name
         $primary = $this->person->names->firstWhere('is_primary', true)
@@ -108,7 +112,7 @@ class OverviewTab extends Component
         $this->validate([
             'gender'               => 'nullable|in:male,female,unknown',
             'birthday'             => 'nullable|date',
-            'date_of_death'        => 'nullable|date',
+            'deathDate'            => 'nullable|date',
             'notes'                => 'nullable|string|max:10000',
             'firstName'            => 'nullable|string|max:255',
             'lastName'             => 'nullable|string|max:255',
@@ -118,15 +122,15 @@ class OverviewTab extends Component
             'photoUpload'          => 'nullable|image|max:10240',
         ]);
 
-        // Save person fields (no date_of_birth here)
+        // Save person fields (birthday and death are key dates)
         $this->person->update([
             'gender'        => $this->gender,
-            'date_of_death' => $this->date_of_death,
             'notes'         => $this->notes,
         ]);
 
         // Save birthday as KeyDate
         $this->saveBirthday();
+        $this->saveDeath();
 
         // Save primary name
         $nameData = [
@@ -235,6 +239,37 @@ class OverviewTab extends Component
                 $this->birthdayKeyDateId = null;
             }
         }
+    }
+
+    protected function saveDeath(): void
+    {
+        if (!$this->deathDate) {
+            // Death date cleared — delete the KeyDate if one exists
+            if ($this->deathKeyDateId) {
+                KeyDate::find($this->deathKeyDateId)?->delete();
+                $this->deathKeyDateId = null;
+            }
+            return;
+        }
+
+        $data = ['date' => $this->deathDate, 'logged_at' => now()];
+
+        $kd = $this->deathKeyDateId ? KeyDate::find($this->deathKeyDateId) : null;
+        if ($kd) {
+            $kd->update($data);
+            return;
+        }
+
+        $kd = KeyDate::create($data + [
+            'user_id'          => $this->person->user_id,
+            'year_unknown'     => false,
+            'type'             => 'death',
+            'is_recurring'     => true,
+            'recurrence_count' => 3,
+            'significance'     => 4,
+        ]);
+        $kd->persons()->attach($this->person->id, ['is_primary' => true]);
+        $this->deathKeyDateId = $kd->id;
     }
 
     public function render()

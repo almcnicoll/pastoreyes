@@ -31,13 +31,7 @@ class RelationshipsTab extends Component
 
     protected $listeners = [
         'graph:initiateRelationship' => 'initiateRelationshipFromGraph',
-        'person-selected'            => 'onPersonSelected',
     ];
-
-    public function onPersonSelected(int $personId): void
-    {
-        $this->relatedPersonId = $personId;
-    }
 
     public function mount(Person $person): void
     {

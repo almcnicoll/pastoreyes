@@ -96,9 +96,9 @@
 
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Related Person</label>
-                    <livewire:person-search-select
+                    <livewire:person-picker
+                        wire:model="relatedPersonId"
                         :excludeId="$person->id"
-                        :value="$relatedPersonId"
                         :key="'rel-person-search-'.$person->id" />
                     @error('relatedPersonId')
                         <p class="text-xs text-red-500 mt-1">{{ $message }}</p>

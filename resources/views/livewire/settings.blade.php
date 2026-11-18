@@ -10,7 +10,7 @@
                     'google'        => 'Google',
                     'appearance'    => 'Appearance',
                     'rel_types'     => 'Relationship Types',
-                    'key_dates'     => 'Key Date Defaults',
+                    'dashboard'     => 'Dashboard',
                     'prayer_email'  => 'Prayer Emails',
                     'data'          => 'Data',
                 ];
@@ -27,7 +27,7 @@
                                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
                     {{ $label }}
                     @if(in_array($tab, ['users', 'mail']) && auth()->user()->is_admin)
-                        <span class="ml-1 text-xs bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded-full">Admin</span>
+                        <span class="ml-1 text-xs bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded-full">Administrator</span>
                     @endif
                 </button>
             @endforeach
@@ -65,7 +65,7 @@
         </div>
         <div>
             <label class="block text-xs font-medium text-gray-600 mb-1">Account Created</label>
-            <p class="text-sm text-gray-500">{{ auth()->user()->created_at->format('j F Y') }}</p>
+            <p class="text-sm text-gray-500">{{ auth()->user()->created_at->format('j M Y') }}</p>
         </div>
 
         <button wire:click="saveAccount"
@@ -279,19 +279,19 @@
 
     </div>
 
-    {{-- Key Date Defaults Tab --}}
-    @elseif($activeTab === 'key_dates')
+    {{-- Dashboard Tab --}}
+    @elseif($activeTab === 'dashboard')
     <div class="max-w-md space-y-4">
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Upcoming Key Dates Window</label>
-            <p class="text-xs text-gray-400 mb-2">How many days ahead to show on the Dashboard.</p>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Upcoming window</label>
+            <p class="text-xs text-gray-400 mb-2">How many days ahead the Dashboard looks for upcoming key dates, tasks and goal targets.</p>
             <div class="flex items-center gap-3">
                 <input wire:model="upcomingDaysWindow" type="number" min="7" max="365"
                        class="w-24 border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
                 <span class="text-sm text-gray-500">days</span>
             </div>
         </div>
-        <button wire:click="saveAppearance"
+        <button wire:click="saveDashboard"
                 class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors">
             Save
         </button>
@@ -338,7 +338,7 @@
                         <span class="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">Disabled</span>
                     @endif
                     @if($u->is_admin)
-                        <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">Admin</span>
+                        <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">Administrator</span>
                     @endif
                 </button>
             @endforeach

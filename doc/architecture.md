@@ -34,7 +34,7 @@ Eloquent casts rather than in controller/view code.
 | `Note` | Dated, free-text record of a meeting/event, with a significance rating. |
 | `PrayerNeed` | A prayer need for one or more people; open until resolved (`resolved_at`), with optional resolution details. |
 | `Goal` / `Outcome` | Mentoring goals and their outcomes, dated and rated for significance. |
-| `KeyDate` | Birthdays (year optional), anniversaries, etc. Recurring by default or one-off; can sync to Google Calendar. |
+| `KeyDate` | Birthdays (year optional), deaths, anniversaries, etc. (`KeyDate::TYPES` is the single list of types). Recurring by default or one-off; `recurrence_count` limits a recurring date to N anniversaries (a **Death** is a memorial for its first 3). Can sync to Google Calendar. A person's birthday and date of death are key dates, not person fields. |
 | `PersonPhoto` | Photo attached to a person. |
 | `Task` | Follow-up/to-do items. |
 | `ContactSyncState` / `ContactSyncReview` | Track Google Contacts import/sync state and surface conflicts for manual review. |
@@ -50,6 +50,9 @@ Use these terms consistently in UI text, messages and docs.
 - **Note** — only the single entry type. A person's free-text field is **About**; names and relationships have their
   own scoped **Notes** field.
 - **Prayer Need** — never "prayer request". The database and code keep `prayer_need` / `PrayerNeed`.
+- **Contact Sync** — the feature that compares linked Google contacts with PastorEyes; its review queue is headed *Pending reviews*.
+  **Add from Google Contacts** creates a new person; **Link to Google Contact** attaches an existing person.
+- **Administrator** — the admin role label (never "Admin"). Dates are shown as `14 Mar 2026`.
 - **Open / closed words** — Prayer Needs and Goals: *Active* / *Resolved*; Tasks: *Active* / *Completed*;
   contact sync differences: *Pending* / *Resolved*.
 
@@ -117,4 +120,5 @@ every five minutes: `*/5 * * * * cd /path-to-project && php artisan schedule:run
   middleware.
 - Pages are full-page Livewire components (`app/Livewire/*`), not a REST API —
   the browser talks to Livewire's own endpoints under the hood.
+- Person pickers: one `person-picker` Livewire component (single/multi, bind with `wire:model`) over `App\Services\PersonSearch`, which matches every name a person has. The nav search uses the same helper.
 - `app/Actions/` holds import/export/sync operations too heavy for a controller method.

@@ -46,10 +46,6 @@ class Settings extends Component
     public bool $managedIsActive = true;
     public bool $managedIsAdmin = false;
 
-    protected $listeners = [
-        'person-selected' => 'onPersonSelected',
-    ];
-
     public function mount(): void
     {
         $user = auth()->user();
@@ -122,10 +118,18 @@ class Settings extends Component
         $settings['gender_colors']       = $this->genderColors;
         $settings['significance_colors']  = $this->significanceColors;
         $settings['entry_type_colors']    = $this->entryTypeColors;
-        $settings['upcoming_days_window'] = $this->upcomingDaysWindow;
 
         auth()->user()->update(['settings' => $settings]);
         $this->dispatch('notify', message: 'Appearance settings saved.');
+    }
+
+    public function saveDashboard(): void
+    {
+        $settings = auth()->user()->settings ?? [];
+        $settings['upcoming_days_window'] = $this->upcomingDaysWindow;
+
+        auth()->user()->update(['settings' => $settings]);
+        $this->dispatch('notify', message: 'Dashboard settings saved.');
     }
 
     // -------------------------------------------------------------------------

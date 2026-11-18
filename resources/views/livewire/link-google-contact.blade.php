@@ -11,7 +11,7 @@
              x-transition:enter-end="opacity-100 translate-y-0">
 
             <div class="flex items-center justify-between mb-5">
-                <h2 class="text-base font-semibold text-gray-800">Find in Google Contacts</h2>
+                <h2 class="text-base font-semibold text-gray-800">Link to Google Contact</h2>
                 <button wire:click="closeModal" class="text-gray-400 hover:text-gray-600">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>

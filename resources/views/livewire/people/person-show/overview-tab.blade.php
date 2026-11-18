@@ -131,9 +131,15 @@
             </div>
 
             <div class="mt-3">
-                <label class="block text-xs font-medium text-gray-600 mb-1">Date of Death</label>
-                <input wire:model="date_of_death" type="date"
+                <label class="block text-xs font-medium text-gray-600 mb-1">
+                    Date of Death
+                    <span class="text-gray-400 font-normal">(also shown under Key Dates)</span>
+                </label>
+                <input wire:model="deathDate" type="date"
                        class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+                @error('deathDate')
+                    <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
             <div class="mt-3">
@@ -187,7 +193,7 @@
         {{-- Personal Details --}}
         @php
             $birthdayKd = $person->keyDates()->where('type', 'birthday')->first();
-            $deathDate  = $person->date_of_death ? \Carbon\Carbon::parse($person->date_of_death) : null;
+            $deathDate  = $person->keyDates()->where('type', 'death')->first()?->date;
         @endphp
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -201,9 +207,9 @@
                 <p class="text-xs text-gray-400 mb-0.5">Birthday</p>
                 <p class="text-sm text-gray-700">
                     @if($birthdayKd->year_unknown)
-                        {{ $birthdayKd->date->format('j F') }} (year unknown)
+                        {{ $birthdayKd->date->format('j M') }} (year unknown)
                     @else
-                        {{ $birthdayKd->date->format('j F Y') }}
+                        {{ $birthdayKd->date->format('j M Y') }}
                         @if(!$deathDate)
                             <span class="text-gray-400">(age {{ $birthdayKd->date->age }})</span>
                         @endif
@@ -215,7 +221,7 @@
             @if($deathDate)
             <div>
                 <p class="text-xs text-gray-400 mb-0.5">Date of Death</p>
-                <p class="text-sm text-gray-700">{{ $deathDate->format('j F Y') }}</p>
+                <p class="text-sm text-gray-700">{{ $deathDate->format('j M Y') }}</p>
             </div>
             @endif
         </div>
@@ -255,7 +261,7 @@
             @else
                 <button wire:click="$dispatch('open-link-google-contact', { personId: {{ $person->id }} })"
                         class="text-sm text-indigo-600 hover:underline">
-                    Find in Google Contacts
+                    Link to Google Contact
                 </button>
             @endif
         </div>

@@ -2,7 +2,7 @@
 
 namespace App\Livewire;
 
-use App\Models\Person;
+use App\Services\PersonSearch;
 use Livewire\Component;
 
 /**
@@ -12,32 +12,9 @@ class GlobalSearch extends Component
 {
     public string $search = '';
 
-    /** Names are encrypted, so matching happens in PHP across every name a person has. */
     protected function results()
     {
-        $terms = preg_split('/\s+/', strtolower(trim($this->search)), -1, PREG_SPLIT_NO_EMPTY);
-        if (!$terms) {
-            return collect();
-        }
-
-        return Person::where('user_id', auth()->id())
-            ->with(['primaryName', 'names'])
-            ->get()
-            ->filter(function ($person) use ($terms) {
-                $haystack = strtolower($person->display_name . ' ' . $person->names
-                    ->map(fn($n) => implode(' ', [$n->first_name, $n->middle_names, $n->last_name, $n->preferred_name]))
-                    ->implode(' '));
-
-                foreach ($terms as $term) {
-                    if (!str_contains($haystack, $term)) {
-                        return false;
-                    }
-                }
-                return true;
-            })
-            ->sortBy(fn($p) => strtolower($p->display_name))
-            ->take(8)
-            ->values();
+        return PersonSearch::find(auth()->id(), $this->search);
     }
 
     /** Enter key: go straight to the top result. */

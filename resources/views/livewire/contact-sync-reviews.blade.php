@@ -3,9 +3,9 @@
     {{-- Header --}}
     <div class="flex items-center justify-between mb-6">
         <div>
-            <h1 class="text-2xl font-bold text-gray-800">Contact Sync Reviews</h1>
+            <h1 class="text-2xl font-bold text-gray-800">Contact Sync</h1>
             <p class="text-sm text-gray-400 mt-0.5">
-                Differences detected between PastorEyes and Google Contacts.
+                Pending reviews: differences detected between PastorEyes and Google Contacts.
             </p>
         </div>
 

@@ -71,7 +71,7 @@
 
     {{-- Contacts Integration Note --}}
     <div>
-        <h3 class="text-sm font-semibold text-gray-700 mb-2">Google Contacts</h3>
+        <h3 class="text-sm font-semibold text-gray-700 mb-2">Contact Sync</h3>
         <p class="text-xs text-gray-500 leading-relaxed">
             People can be linked to a Google Contact from their profile page.
             When a person is linked, you can view and edit their contact details

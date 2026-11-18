@@ -6,7 +6,6 @@ use App\Models\Goal;
 use App\Models\KeyDate;
 use App\Models\Note;
 use App\Models\Outcome;
-use App\Models\Person;
 use App\Models\PrayerNeed;
 use App\Models\TimelineEntry;
 use Illuminate\Support\Collection;
@@ -59,8 +58,6 @@ class Timeline extends Component
 
     // Person links for edit
     public array $editSelectedPersonIds = [];
-    public string $editPersonSearch = '';
-    public $editPersonResults;
 
     protected $listeners = [
         'timeline-updated' => '$refresh',
@@ -154,8 +151,6 @@ class Timeline extends Component
 
         // Person links
         $this->editSelectedPersonIds = $source->persons->pluck('id')->toArray();
-        $this->editPersonSearch      = '';
-        $this->editPersonResults     = collect();
 
         $this->showEditForm = true;
     }
@@ -179,8 +174,6 @@ class Timeline extends Component
         $this->editIsRecurring    = true;
         $this->editYearUnknown    = false;
         $this->editSelectedPersonIds = [];
-        $this->editPersonSearch   = '';
-        $this->editPersonResults  = collect();
     }
 
     /** The model behind the entry being edited, or null if it isn't the current user's. */
@@ -237,7 +230,7 @@ class Timeline extends Component
         }
 
         if ($this->editType === 'key_date') {
-            $rules['editKeyDateType'] = 'required|in:birthday,wedding_anniversary,bereavement,other';
+            $rules['editKeyDateType'] = ['required', \Illuminate\Validation\Rule::in(array_keys(\App\Models\KeyDate::TYPES))];
             $rules['editLabel']       = 'nullable|string|max:255';
         }
 
@@ -301,43 +294,6 @@ class Timeline extends Component
         $this->dispatch('timeline-updated');
     }
 
-    public function updatedEditPersonSearch(): void
-    {
-        if (strlen($this->editPersonSearch) < 1) {
-            $this->editPersonResults = collect();
-            return;
-        }
-
-        $search          = strtolower($this->editPersonSearch);
-        $alreadySelected = $this->editSelectedPersonIds;
-
-        $this->editPersonResults = Person::where('user_id', auth()->id())
-            ->with('primaryName')
-            ->get()
-            ->filter(fn($p) =>
-                str_contains(strtolower($p->display_name), $search) &&
-                !in_array($p->id, $alreadySelected)
-            )
-            ->take(8)
-            ->values();
-    }
-
-    public function addEditPerson(int $personId): void
-    {
-        if (!in_array($personId, $this->editSelectedPersonIds)) {
-            $this->editSelectedPersonIds[] = $personId;
-        }
-        $this->editPersonSearch  = '';
-        $this->editPersonResults = collect();
-    }
-
-    public function removeEditPerson(int $personId): void
-    {
-        $this->editSelectedPersonIds = array_values(
-            array_filter($this->editSelectedPersonIds, fn($id) => $id !== $personId)
-        );
-    }
-
     public function getEntriesProperty(): Collection
     {
         $query = TimelineEntry::forUser(auth()->id());
@@ -387,15 +343,9 @@ class Timeline extends Component
             ];
         })->filter(fn($item) => $item['source'] !== null)->values();
 
-        $editSelectedPersons = empty($this->editSelectedPersonIds)
-            ? collect()
-            : Person::whereIn('id', $this->editSelectedPersonIds)->get()
-                ->sortBy(fn($p) => array_search($p->id, $this->editSelectedPersonIds));
-
         return view('livewire.timeline', [
             'entries'             => $entries,
             'entryTypes'          => config('entry_types.types'),
-            'editSelectedPersons' => $editSelectedPersons,
         ])->layout(
             $this->personId ? null : 'layouts.app',
             $this->personId ? [] : ['title' => 'Timeline — PastorEyes']

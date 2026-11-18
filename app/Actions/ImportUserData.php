@@ -91,10 +91,23 @@ class ImportUserData
                 'user_id'          => $user->id,
                 'google_contact_id' => $record['google_contact_id'] ?? null,
                 'gender'           => $record['gender'] ?? null,
-                'date_of_death'    => $record['date_of_death'] ?? null,
                 'notes'            => $record['notes'] ?? null,
             ]);
             $this->idMap['persons'][$record['id']] = $person->id;
+
+            // Older exports kept date of death on the person; it is now a Death key date
+            if (!empty($record['date_of_death'])) {
+                $kd = KeyDate::create([
+                    'user_id'          => $user->id,
+                    'date'             => \Carbon\Carbon::parse($record['date_of_death'])->toDateString(),
+                    'logged_at'        => now(),
+                    'type'             => 'death',
+                    'is_recurring'     => true,
+                    'recurrence_count' => 3,
+                    'significance'     => 4,
+                ]);
+                $kd->persons()->attach($person->id, ['is_primary' => true]);
+            }
         }
         return count($records);
     }
@@ -288,6 +301,7 @@ class ImportUserData
                 'type'         => $record['type'],
                 'label'        => $record['label'] ?? null,
                 'is_recurring' => $record['is_recurring'] ?? true,
+                'recurrence_count' => $record['recurrence_count'] ?? null,
                 'significance' => $record['significance'],
                 // Don't import Google Calendar sync IDs — they're environment-specific
                 'google_calendar_event_id' => null,

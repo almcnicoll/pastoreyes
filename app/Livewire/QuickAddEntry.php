@@ -4,9 +4,7 @@ namespace App\Livewire;
 
 use App\Livewire\Concerns\CatchesDbErrors;
 use App\Models\Goal;
-use App\Models\KeyDate;
 use App\Models\Note;
-use App\Models\Person;
 use App\Models\PrayerNeed;
 use Livewire\Component;
 
@@ -16,8 +14,6 @@ class QuickAddEntry extends Component
     public bool $open = false;
     public string $type = '';
     public array $selectedPersonIds = [];
-    public string $personSearch = '';
-    public $personResults = null;
 
     // Common fields
     public string $title = '';
@@ -42,43 +38,6 @@ class QuickAddEntry extends Component
     {
         $this->selectedPersonIds = $personId ? [$personId] : [];
         $this->open              = true;
-    }
-
-    public function updatedPersonSearch(): void
-    {
-        if (strlen($this->personSearch) < 1) {
-            $this->personResults = collect();
-            return;
-        }
-
-        $search          = strtolower($this->personSearch);
-        $alreadySelected = $this->selectedPersonIds;
-
-        $this->personResults = Person::where('user_id', auth()->id())
-            ->with('primaryName')
-            ->get()
-            ->filter(fn($p) =>
-                str_contains(strtolower($p->display_name), $search) &&
-                !in_array($p->id, $alreadySelected)
-            )
-            ->take(8)
-            ->values();
-    }
-
-    public function addPerson(int $personId): void
-    {
-        if (!in_array($personId, $this->selectedPersonIds)) {
-            $this->selectedPersonIds[] = $personId;
-        }
-        $this->personSearch  = '';
-        $this->personResults = collect();
-    }
-
-    public function removePerson(int $personId): void
-    {
-        $this->selectedPersonIds = array_values(
-            array_filter($this->selectedPersonIds, fn($id) => $id !== $personId)
-        );
     }
 
     public function updatedType(): void
@@ -116,7 +75,7 @@ class QuickAddEntry extends Component
 
         $label = config("entry_types.types.{$this->type}.label");
 
-        $this->reset(['open', 'type', 'selectedPersonIds', 'personSearch', 'personResults', 'title', 'body', 'significance', 'targetDate']);
+        $this->reset(['open', 'type', 'selectedPersonIds', 'title', 'body', 'significance', 'targetDate']);
         $this->date = now()->format('Y-m-d');
         $this->significance = 3;
 
@@ -163,18 +122,13 @@ class QuickAddEntry extends Component
 
     public function closeModal(): void
     {
-        $this->reset(['open', 'type', 'selectedPersonIds', 'personSearch', 'personResults', 'title', 'body', 'targetDate']);
+        $this->reset(['open', 'type', 'selectedPersonIds', 'title', 'body', 'targetDate']);
         $this->date        = now()->format('Y-m-d');
         $this->significance = 3;
     }
 
     public function render()
     {
-        // Keep chips in the order people were selected
-        $selectedPersons = Person::whereIn('id', $this->selectedPersonIds)->with('primaryName')->get()
-            ->sortBy(fn($p) => array_search($p->id, $this->selectedPersonIds))
-            ->values();
-
-        return view('livewire.quick-add-entry', ['selectedPersons' => $selectedPersons]);
+        return view('livewire.quick-add-entry');
     }
 }

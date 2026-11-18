@@ -6,6 +6,7 @@ use App\Actions\SyncKeyDateToCalendar;
 use App\Livewire\Concerns\CatchesDbErrors;
 use App\Models\KeyDate;
 use App\Models\Person;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 
 class KeyDatesTab extends Component
@@ -21,6 +22,7 @@ class KeyDatesTab extends Component
     public bool $yearUnknown = false;
     public ?string $label = null;
     public bool $isRecurring = true;
+    public ?int $recurrenceCount = null;
     public int $significance = 3;
     public bool $syncToCalendar = false;
     public ?string $googleCalendarId = null;
@@ -43,6 +45,15 @@ class KeyDatesTab extends Component
         );
     }
 
+    /** A Death is a memorial that recurs for its first three anniversaries, then stops. */
+    public function updatedType(string $value): void
+    {
+        if ($value === 'death' && !$this->editingId) {
+            $this->isRecurring     = true;
+            $this->recurrenceCount = 3;
+        }
+    }
+
     public function openAdd(): void
     {
         $this->resetForm();
@@ -60,6 +71,7 @@ class KeyDatesTab extends Component
         $this->yearUnknown      = $kd->year_unknown;
         $this->label            = $kd->label;
         $this->isRecurring      = $kd->is_recurring;
+        $this->recurrenceCount  = $kd->recurrence_count;
         $this->significance     = $kd->significance;
         $this->googleCalendarId = $kd->google_calendar_id;
         $this->syncToCalendar   = (bool) $kd->google_calendar_event_id;
@@ -69,7 +81,8 @@ class KeyDatesTab extends Component
     public function save(): void
     {
         $this->validate([
-            'type'        => 'required|in:birthday,wedding_anniversary,bereavement,other',
+            'type'        => ['required', Rule::in(array_keys(KeyDate::TYPES))],
+            'recurrenceCount' => 'nullable|integer|min:1|max:100',
             'date'        => 'required|date',
             'label'       => 'nullable|string|max:500',
             'significance' => 'required|integer|min:1|max:5',
@@ -82,6 +95,7 @@ class KeyDatesTab extends Component
             'year_unknown'      => $this->yearUnknown,
             'label'             => $this->label,
             'is_recurring'      => $this->isRecurring,
+            'recurrence_count'  => $this->isRecurring ? $this->recurrenceCount : null,
             'significance'      => $this->significance,
             'logged_at'         => now(),
         ];
@@ -131,6 +145,7 @@ class KeyDatesTab extends Component
         $this->yearUnknown      = false;
         $this->label            = null;
         $this->isRecurring      = true;
+        $this->recurrenceCount  = null;
         $this->significance     = 3;
         $this->syncToCalendar   = false;
         $this->googleCalendarId = null;
@@ -140,7 +155,7 @@ class KeyDatesTab extends Component
     {
         $keyDates = $this->person->keyDates()
             ->get()
-            ->sortBy('days_until')
+            ->sortBy(fn($kd) => $kd->days_until ?? PHP_INT_MAX)
             ->values();
 
         return view('livewire.people.person-show.key-dates-tab', [

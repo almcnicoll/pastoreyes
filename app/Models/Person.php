@@ -20,14 +20,12 @@ class Person extends Model
         'user_id',
         'google_contact_id',
         'gender',
-        'date_of_death',
         'notes',
     ];
 
     protected function casts(): array
     {
         return [
-            'date_of_death' => EncryptedCast::class,
             'notes'         => EncryptedCast::class,
         ];
     }

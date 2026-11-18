@@ -108,6 +108,6 @@ class ContactSyncReviews extends Component
 
         return view('livewire.contact-sync-reviews', compact(
             'reviews', 'grouped', 'syncState', 'pendingCount'
-        ))->layout('layouts.app', ['title' => 'Contact Sync Reviews — PastorEyes']);
+        ))->layout('layouts.app', ['title' => 'Contact Sync — PastorEyes']);
     }
 }

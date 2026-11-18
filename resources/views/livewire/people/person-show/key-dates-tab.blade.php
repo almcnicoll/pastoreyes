@@ -20,17 +20,19 @@
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2 flex-wrap">
                         <span class="text-sm font-medium text-gray-700">
-                            {{ $kd->label ?? ucfirst(str_replace('_', ' ', $kd->type)) }}
+                            {{ $kd->display_title }}
                         </span>
                         <span class="text-xs text-gray-400">
                             @if($kd->year_unknown)
-                                {{ $kd->date->format('j F') }}
+                                {{ $kd->date->format('j M') }}
                             @else
-                                {{ $kd->date->format('j F Y') }}
+                                {{ $kd->date->format('j M Y') }}
                             @endif
                         </span>
                         @if($kd->is_recurring)
-                            <span class="text-xs bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded">recurring</span>
+                            <span class="text-xs bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded">
+                                recurring{{ $kd->recurrence_count ? " · first {$kd->recurrence_count} years" : '' }}
+                            </span>
                         @endif
                         @if($kd->is_synced)
                             <span class="text-xs bg-green-50 text-green-600 px-1.5 py-0.5 rounded">synced</span>
@@ -81,10 +83,9 @@
                     <label class="block text-xs font-medium text-gray-600 mb-1">Type</label>
                     <select wire:model="type"
                             class="w-full border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="birthday">Birthday</option>
-                        <option value="wedding_anniversary">Wedding Anniversary</option>
-                        <option value="bereavement">Bereavement</option>
-                        <option value="other">Other</option>
+                        @foreach(\App\Models\KeyDate::TYPES as $value => $typeLabel)
+                            <option value="{{ $value }}">{{ $typeLabel }}</option>
+                        @endforeach
                     </select>
                 </div>
                 <div>
@@ -110,6 +111,14 @@
                     <input wire:model="isRecurring" type="checkbox" class="rounded">
                     Recurring annually
                 </label>
+                @if($isRecurring)
+                <label class="flex items-center gap-2 text-xs text-gray-600">
+                    For
+                    <input wire:model="recurrenceCount" type="number" min="1" max="100" placeholder="always"
+                           class="w-16 border border-gray-300 rounded text-xs px-2 py-1">
+                    years
+                </label>
+                @endif
                 <label class="flex items-center gap-2 text-xs text-gray-600">
                     <input wire:model="syncToCalendar" type="checkbox" class="rounded">
                     Sync to Google Calendar

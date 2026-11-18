@@ -23,6 +23,7 @@ class KeyDate extends Model
         'type',
         'label',
         'is_recurring',
+        'recurrence_count',
         'significance',
         'google_calendar_event_id',
         'google_calendar_id',
@@ -31,7 +32,8 @@ class KeyDate extends Model
     public const TYPES = [
         'birthday'            => 'Birthday',
         'wedding_anniversary' => 'Wedding Anniversary',
-        'bereavement'         => 'Bereavement',
+        'death'               => 'Death',
+        'bereavement'         => 'Bereavement (loss of someone close)',
         'other'               => 'Other',
     ];
 
@@ -43,6 +45,7 @@ class KeyDate extends Model
             'logged_at'    => 'datetime',
             'year_unknown' => 'boolean',
             'is_recurring' => 'boolean',
+            'recurrence_count' => 'integer',
             'significance' => 'integer',
         ];
     }
@@ -60,7 +63,7 @@ class KeyDate extends Model
 
     /**
      * Get the next occurrence of this date from today.
-     * For recurring dates, calculates the next calendar occurrence.
+     * For recurring dates, calculates the next calendar occurrence (null once a limited run has ended).
      * For one-off dates, returns the date itself.
      */
     public function getNextOccurrenceAttribute(): ?\Carbon\Carbon
@@ -79,6 +82,12 @@ class KeyDate extends Model
         // If this year's occurrence has already passed, use next year
         if ($occurrence->lt($today)) {
             $occurrence->addYear();
+        }
+
+        // A limited run (e.g. the first 3 anniversaries of a death) has ended
+        if ($this->recurrence_count && !$this->year_unknown
+            && $occurrence->year > $this->date->year + $this->recurrence_count) {
+            return null;
         }
 
         return $occurrence;

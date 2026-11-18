@@ -57,7 +57,6 @@ class ExportUserData
             'id'               => $p->id,
             'google_contact_id' => $p->google_contact_id,
             'gender'           => $p->gender,
-            'date_of_death'    => $p->date_of_death,
             'notes'            => $p->notes,
         ])->toArray();
     }
@@ -202,6 +201,7 @@ class ExportUserData
             'type'                    => $k->type,
             'label'                   => $k->label,
             'is_recurring'            => $k->is_recurring,
+            'recurrence_count'        => $k->recurrence_count,
             'significance'            => $k->significance,
             'google_calendar_event_id' => $k->google_calendar_event_id,
             'google_calendar_id'      => $k->google_calendar_id,

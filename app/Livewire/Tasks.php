@@ -3,7 +3,6 @@
 namespace App\Livewire;
 
 use App\Livewire\Concerns\CatchesDbErrors;
-use App\Models\Person;
 use App\Models\Task;
 use Illuminate\Support\Collection;
 use Livewire\Component;
@@ -23,55 +22,9 @@ class Tasks extends Component
     public string $dueDate = '';
     public array $selectedPersonIds = [];
 
-    // Person search for the form
-    public string $personSearch = '';
-    public Collection $personResults;
-
-    protected $listeners = [
-        'person-selected-for-task' => 'addPerson',
-    ];
-
     public function mount(): void
     {
-        $this->dueDate       = now()->addDay()->format('Y-m-d');
-        $this->personResults = collect();
-    }
-
-    public function updatedPersonSearch(): void
-    {
-        if (strlen($this->personSearch) < 1) {
-            $this->personResults = collect();
-            return;
-        }
-
-        $search            = strtolower($this->personSearch);
-        $alreadySelected   = $this->selectedPersonIds;
-
-        $this->personResults = Person::where('user_id', auth()->id())
-            ->with('primaryName')
-            ->get()
-            ->filter(fn($p) =>
-                str_contains(strtolower($p->display_name), $search) &&
-                !in_array($p->id, $alreadySelected)
-            )
-            ->take(8)
-            ->values();
-    }
-
-    public function addPerson(int $personId): void
-    {
-        if (!in_array($personId, $this->selectedPersonIds)) {
-            $this->selectedPersonIds[] = $personId;
-        }
-        $this->personSearch  = '';
-        $this->personResults = collect();
-    }
-
-    public function removePerson(int $personId): void
-    {
-        $this->selectedPersonIds = array_values(
-            array_filter($this->selectedPersonIds, fn($id) => $id !== $personId)
-        );
+        $this->dueDate = now()->addDay()->format('Y-m-d');
     }
 
     public function openAdd(): void
@@ -165,8 +118,6 @@ class Tasks extends Component
         $this->narrative         = '';
         $this->dueDate           = now()->addDay()->format('Y-m-d');
         $this->selectedPersonIds = [];
-        $this->personSearch      = '';
-        $this->personResults     = collect();
     }
 
     public function render()
@@ -182,12 +133,7 @@ class Tasks extends Component
 
         $tasks = $query->orderBy('due_date', $this->sortDirection)->get();
 
-        // Load selected persons for the form
-        $selectedPersons = count($this->selectedPersonIds)
-            ? Person::whereIn('id', $this->selectedPersonIds)->with('primaryName')->get()
-            : collect();
-
-        return view('livewire.tasks', compact('tasks', 'selectedPersons'))
+        return view('livewire.tasks', compact('tasks'))
             ->layout('layouts.app', ['title' => 'Tasks — PastorEyes']);
     }
 }

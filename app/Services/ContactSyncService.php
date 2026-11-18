@@ -170,11 +170,11 @@ class ContactSyncService
 
         if ($this->valuesDiffer($localDate, $googleDate)) {
             $localDisplay  = $localDate
-                ? Carbon::parse($localDate)->format(($birthdayKd?->year_unknown) ? 'j F' : 'j F Y')
+                ? Carbon::parse($localDate)->format(($birthdayKd?->year_unknown) ? 'j M' : 'j M Y')
                 : '(none)';
             $googleDisplay = $yearUnknown
-                ? Carbon::parse($googleDate)->format('j F') . ' (year unknown in Google)'
-                : Carbon::parse($googleDate)->format('j F Y');
+                ? Carbon::parse($googleDate)->format('j M') . ' (year unknown in Google)'
+                : Carbon::parse($googleDate)->format('j M Y');
 
             return $this->flag($person, 'birthday', 'Birthday', $localDisplay, $googleDisplay);
         }
