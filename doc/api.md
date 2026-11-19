@@ -99,9 +99,13 @@ Token creation requires an acknowledgement, and the Privacy Policy (§2.5, §8) 
 (`api_audit_log`, shown in Settings → API) records the token, method, path, status and a count-style summary only —
 never bodies, query strings, names or text. Idempotency responses are stored encrypted per user.
 
-## Using it from an agent
+## Using it from Claude
 
-Suggested instructions for a project `CLAUDE.md` or skill:
+**The Claude desktop app, or Claude Code with tools:** use the MCP server in `mcp/` (see `mcp/README.md`). It holds the token,
+offers only the tools the token's scope allows, and enforces the rules below itself.
+
+**Calling the API directly** (for example from a script or a Claude Code session without the MCP server):
+suggested instructions for a project `CLAUDE.md` or skill:
 
 ```
 PastorEyes API: base https://<host>/api/v1, token in $PASTOREYES_TOKEN (read-only unless stated).
@@ -115,5 +119,5 @@ PastorEyes API: base https://<host>/api/v1, token in $PASTOREYES_TOKEN (read-onl
 
 ## Not in v1
 
-An MCP server wrapping these endpoints (a thin follow-up that keeps tokens off the model's command line); contact-sync review
+A remote (hosted) MCP server with OAuth, so Claude on the web could connect without a local install (the local one is in `mcp/`); contact-sync review
 actions; prayer-reminder settings; photos; bulk import; webhooks; a free-text "known as" note on a person for telling same-named people apart.

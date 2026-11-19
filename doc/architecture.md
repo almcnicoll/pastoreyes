@@ -140,3 +140,6 @@ Full reference: `doc/api.md`. In short:
 - Controllers (`app/Http/Controllers/Api`) keep per-request state on the request, not on themselves. Entries and tasks created through the API carry `source = 'api'` and the token name.
 - Tests: `tests/Feature/Api` (needs the SQLite test DB, so the MySQL-only `timeline_entries` view migrations are skipped there; the API itself reads the five entry tables directly)
   and `tests/Unit/Api/NarratorTest.php`. `tests/Feature/UiSharedActionsTest.php` checks the web UI still goes through the shared actions.
+- `mcp/` is a separate TypeScript package (not part of the Laravel app or the Vite build): a local stdio MCP server that wraps this API as tools for Claude
+  (see `mcp/README.md`). It keeps the token out of the conversation and enforces dry-run, idempotency, two-step deletes and "stop on ambiguity".
+  Adding an endpoint to `Spec` without a matching tool in `mcp/src/tools.ts` fails `mcp/test/mcp.test.ts`, which parses `Spec.php`.

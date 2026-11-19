@@ -1,0 +1,26 @@
+{
+  "name": "pastoreyes-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MCP server that lets Claude use the PastorEyes API (see ../doc/api.md)",
+  "type": "module",
+  "bin": {
+    "pastoreyes-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "check": "tsc --noEmit",
+    "test": "node --test test/"
+  },
+  "engines": {
+    "node": ">=22.18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2"
+  }
+}
