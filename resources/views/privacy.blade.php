@@ -154,6 +154,10 @@
     <li>No human reads it, except where you have given specific permission, where it is necessary for security purposes or to comply with the law, or where the data is aggregated and anonymised for internal operations.</li>
 </ul>
 
+<h3>2.5 API Access (Optional)</h3>
+<p>PastorEyes can give you a personal API token (Settings &rarr; API) so that a program or AI assistant that <em>you</em> choose can read, and optionally add to, your records. Tokens are off until you create one. Each token is limited to your own data, can be read-only, can expire, and can be revoked at any time. Only a one-way hash of a token is kept. PastorEyes keeps a log of what each token did (the time, the kind of request and a count such as &ldquo;created a Note for 2 people&rdquo;), which you can see in Settings; it does not record names or the text of your records.</p>
+<p><strong>What leaves PastorEyes when you use this.</strong> The API returns your records to the program holding the token in readable form, not encrypted. If that program is an AI assistant, whatever it reads, which can include information imported from Google Contacts (which is part of your records), is processed by the assistant&rsquo;s provider under that provider&rsquo;s own terms. PastorEyes itself does not send your data to any AI service and does not use AI on your data; this happens only if you create a token and give it to such a service, and you are responsible for that choice. Entries added through a token are marked as added through the API.</p>
+
 <h2>3. How Your Data Is Protected</h2>
 
 <h3>3.1 Encryption</h3>
@@ -207,6 +211,7 @@
 <p>PastorEyes integrates with Google&rsquo;s services (Google Contacts and Google Calendar). Your use of these features is also governed by Google&rsquo;s own privacy policy, available at <a href="https://policies.google.com/privacy">policies.google.com/privacy</a>.</p>
 <p><strong>Hosting.</strong> PastorEyes runs on a shared hosting server in the United Kingdom, which stores the database and processes all data on our behalf.</p>
 <p><strong>Email delivery.</strong> If you opt in to Prayer Emails (Settings &rarr; Prayer Emails; they are off unless you turn them on), PastorEyes emails the address on your account a list of the people who have active prayer needs, showing their names and a count, with links back to PastorEyes. The email is sent through the email (SMTP) service configured by the administrator, which therefore handles your email address and those names. The names come from your PastorEyes records, which may include names you imported from Google Contacts. You can turn Prayer Emails off at any time.</p>
+<p><strong>Programs and AI assistants you connect.</strong> If you create an API token (section 2.5) and give it to a program or AI assistant, that service receives the records the token can read. PastorEyes does not choose or control such a service.</p>
 <p>No other third-party analytics, advertising, or tracking services are used.</p>
 
 <h2>9. Children</h2>

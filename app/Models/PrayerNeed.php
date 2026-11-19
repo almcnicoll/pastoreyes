@@ -22,6 +22,8 @@ class PrayerNeed extends Model
         'resolved_at',
         'resolution_details',
         'significance',
+        'source',
+        'source_token_name',
     ];
 
     protected function casts(): array
@@ -56,7 +58,7 @@ class PrayerNeed extends Model
     /**
      * Mark this prayer need as resolved.
      */
-    public function resolve(string $details = null): void
+    public function resolve(?string $details = null): void
     {
         $this->resolved_at = now();
         $this->resolution_details = $details;

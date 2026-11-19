@@ -131,7 +131,10 @@
 <h3>4.3 Account Security</h3>
 <p>Your account is accessed via Google OAuth. You are responsible for maintaining the security of your Google account. You should notify the developer immediately if you suspect unauthorised access to your PastorEyes account.</p>
 
-<h3>4.4 Prohibited Uses</h3>
+<h3>4.4 API Tokens</h3>
+<p>If you create a personal API token (Settings &rarr; API), you are responsible for keeping it secret, for choosing the program or AI assistant you give it to, and for everything that token does or reads, including the sharing of information about third parties described in the Privacy Policy. Use a read-only token unless you need to add records, and revoke any token you no longer use or think has been exposed.</p>
+
+<h3>4.5 Prohibited Uses</h3>
 <p>You must not use PastorEyes to:</p>
 <ul>
     <li>Store information for purposes of harassment, surveillance, or control of individuals</li>

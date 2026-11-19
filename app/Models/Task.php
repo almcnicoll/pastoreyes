@@ -19,6 +19,8 @@ class Task extends Model
         'due_date',
         'is_complete',
         'logged_at',
+        'source',
+        'source_token_name',
     ];
 
     protected function casts(): array

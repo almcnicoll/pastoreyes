@@ -2,6 +2,8 @@
 
 namespace App\Livewire;
 
+use App\Actions\EntryRules;
+use App\Actions\SaveTask;
 use App\Livewire\Concerns\CatchesDbErrors;
 use App\Models\Task;
 use Illuminate\Support\Collection;
@@ -49,27 +51,23 @@ class Tasks extends Component
     public function save(): void
     {
         $this->validate([
-            'title'   => 'required|string|max:500',
+            'title'   => EntryRules::TITLE_REQUIRED,
             'dueDate' => 'required|date',
         ]);
 
-        $data = [
+        $task = null;
+        if ($this->editingId) {
+            $task = Task::findOrFail($this->editingId);
+            abort_if($task->user_id !== auth()->id(), 403);
+        }
+
+        (new SaveTask)->execute($task, [
             'user_id'   => auth()->id(),
             'title'     => $this->title,
             'narrative' => $this->narrative ?: null,
             'due_date'  => $this->dueDate,
             'logged_at' => now(),
-        ];
-
-        if ($this->editingId) {
-            $task = Task::findOrFail($this->editingId);
-            abort_if($task->user_id !== auth()->id(), 403);
-            $task->update($data);
-        } else {
-            $task = Task::create($data);
-        }
-
-        $task->persons()->sync($this->selectedPersonIds);
+        ], $this->selectedPersonIds);
 
         $verb = $this->editingId ? 'updated' : 'added';
         $this->resetForm();

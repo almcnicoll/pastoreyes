@@ -27,6 +27,8 @@ class KeyDate extends Model
         'significance',
         'google_calendar_event_id',
         'google_calendar_id',
+        'source',
+        'source_token_name',
     ];
 
     public const TYPES = [

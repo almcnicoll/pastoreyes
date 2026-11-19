@@ -170,6 +170,10 @@
                         </p>
                     @endif
 
+                    @if($source->source === 'api')
+                        <p class="text-xs text-gray-400 mt-2">Added through the API ({{ $source->source_token_name }})</p>
+                    @endif
+
                     {{-- Edit button --}}
                     <div class="mt-3 flex justify-end">
                         <button wire:click="openEdit('{{ $entry->id }}')"

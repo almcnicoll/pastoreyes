@@ -23,6 +23,8 @@ class Goal extends Model
         'target_date',
         'achieved_at',
         'significance',
+        'source',
+        'source_token_name',
     ];
 
     protected function casts(): array
@@ -83,7 +85,9 @@ class Goal extends Model
     protected static function booted(): void
     {
         // The database cascades outcome rows, but that skips model events, so their person links would be left behind
-        static::deleting(fn(Goal $goal) => $goal->outcomes->each->delete());
+        static::deleting(function (Goal $goal) {
+            $goal->outcomes->each->delete();
+        });
     }
 
     public function outcomes(): HasMany

@@ -7,6 +7,11 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // MySQL-only view (CONCAT / CREATE OR REPLACE); the SQLite test database goes without
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         DB::statement("
             CREATE OR REPLACE VIEW timeline_entries AS
 

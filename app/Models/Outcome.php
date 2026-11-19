@@ -21,6 +21,8 @@ class Outcome extends Model
         'title',
         'body',
         'significance',
+        'source',
+        'source_token_name',
     ];
 
     protected function casts(): array

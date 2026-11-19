@@ -12,6 +12,7 @@
                     'rel_types'     => 'Relationship Types',
                     'dashboard'     => 'Dashboard',
                     'prayer_email'  => 'Prayer Emails',
+                    'api'           => 'API',
                     'data'          => 'Data',
                 ];
                 if(auth()->user()->is_admin) {
@@ -300,6 +301,9 @@
     {{-- Data Tab --}}
     @elseif($activeTab === 'prayer_email')
     <livewire:prayer-email-settings />
+
+    @elseif($activeTab === 'api')
+    <livewire:api-settings />
 
     @elseif($activeTab === 'data')
     <livewire:data-settings />

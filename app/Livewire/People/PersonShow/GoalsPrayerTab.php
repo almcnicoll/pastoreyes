@@ -2,9 +2,12 @@
 
 namespace App\Livewire\People\PersonShow;
 
+use App\Actions\CreateEntry;
+use App\Actions\EntryRules;
+use App\Actions\RecordOutcome;
+use App\Actions\ResolvePrayerNeed;
 use App\Livewire\Concerns\CatchesDbErrors;
 use App\Models\Goal;
-use App\Models\Outcome;
 use App\Models\Person;
 use App\Models\PrayerNeed;
 use Livewire\Component;
@@ -117,31 +120,22 @@ class GoalsPrayerTab extends Component
 
     protected function saveGoal(): void
     {
-        $this->validate([
-            'title'       => 'required|string|max:500',
-            'body'        => 'required|string',
-            'significance' => 'required|integer|min:1|max:5',
-            'date'        => 'required|date',
-            'targetDate'  => 'nullable|date',
-        ]);
+        $this->validate(EntryRules::livewire('goal'));
 
         $data = [
-            'user_id'     => auth()->id(),
             'title'       => $this->title,
             'body'        => $this->body,
             'significance' => $this->significance,
             'date'        => $this->date,
             'target_date' => $this->targetDate,
-            'logged_at'   => now(),
         ];
 
         if ($this->editingId) {
             $goal = Goal::findOrFail($this->editingId);
             abort_if($goal->user_id !== auth()->id(), 403);
-            $goal->update($data);
+            $goal->update($data + ['logged_at' => now()]);
         } else {
-            $goal = Goal::create($data);
-            $goal->persons()->attach($this->person->id, ['is_primary' => true]);
+            (new CreateEntry)->execute(auth()->id(), 'goal', [$this->person->id], $data);
         }
 
         $verb = $this->editingId ? 'updated' : 'added';
@@ -151,29 +145,21 @@ class GoalsPrayerTab extends Component
 
     protected function savePrayer(): void
     {
-        $this->validate([
-            'title'       => 'nullable|string|max:500',
-            'body'        => 'required|string',
-            'significance' => 'required|integer|min:1|max:5',
-            'date'        => 'required|date',
-        ]);
+        $this->validate(EntryRules::livewire('prayer_need'));
 
         $data = [
-            'user_id'     => auth()->id(),
             'title'       => $this->title ?: null,
             'body'        => $this->body,
             'significance' => $this->significance,
             'date'        => $this->date,
-            'logged_at'   => now(),
         ];
 
         if ($this->editingId) {
             $need = PrayerNeed::findOrFail($this->editingId);
             abort_if($need->user_id !== auth()->id(), 403);
-            $need->update($data);
+            $need->update($data + ['logged_at' => now()]);
         } else {
-            $need = PrayerNeed::create($data);
-            $need->persons()->attach($this->person->id, ['is_primary' => true]);
+            (new CreateEntry)->execute(auth()->id(), 'prayer_need', [$this->person->id], $data);
         }
 
         $verb = $this->editingId ? 'updated' : 'added';
@@ -186,31 +172,15 @@ class GoalsPrayerTab extends Component
         $this->validate([
             'goalComplete'  => 'boolean',
             'achievedAt'    => 'nullable|required_if:goalComplete,true|date',
-            'outcomeTitle'  => 'required|string|max:500',
-            'outcomeBody'   => 'required|string',
-            'significance'  => 'required|integer|min:1|max:5',
+            'outcomeTitle'  => EntryRules::TITLE_REQUIRED,
+            'outcomeBody'   => EntryRules::BODY,
+            'significance'  => EntryRules::SIGNIFICANCE,
         ]);
 
         $goal = Goal::findOrFail($this->editingId);
         abort_if($goal->user_id !== auth()->id(), 403);
 
-        if ($this->goalComplete) {
-            $goal->markAchieved($this->achievedAt ? new \DateTime($this->achievedAt) : null);
-        }
-
-        $outcome = Outcome::create([
-            'user_id'      => auth()->id(),
-            'goal_id'      => $goal->id,
-            'title'        => $this->outcomeTitle,
-            'body'         => $this->outcomeBody,
-            'significance' => $this->significance,
-            'date'         => now()->format('Y-m-d'),
-            'logged_at'    => now(),
-        ]);
-
-        // Attach same persons as the goal
-        $personIds = $goal->persons()->pluck('persons.id');
-        $outcome->persons()->attach($personIds, ['is_primary' => true]);
+        (new RecordOutcome)->execute($goal, $this->outcomeTitle, $this->outcomeBody, $this->significance, $this->goalComplete, $this->achievedAt);
 
         $this->resetForm();
         $this->dispatch('notify', message: 'Outcome recorded.');
@@ -225,9 +195,7 @@ class GoalsPrayerTab extends Component
 
         $need = PrayerNeed::findOrFail($this->editingId);
         abort_if($need->user_id !== auth()->id(), 403);
-        $need->resolve($this->resolutionDetails ?: null);
-        $need->resolved_at = $this->resolvedAt;
-        $need->save();
+        (new ResolvePrayerNeed)->resolve($need, $this->resolvedAt, $this->resolutionDetails ?: null);
 
         $this->resetForm();
         $this->dispatch('notify', message: 'Prayer Need resolved.');

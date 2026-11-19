@@ -2,7 +2,7 @@
 
 namespace App\Livewire\People\PersonShow;
 
-use App\Models\KeyDate;
+use App\Actions\SavePersonKeyDate;
 use App\Models\Person;
 use App\Models\PersonName;
 use App\Models\PersonPhoto;
@@ -211,65 +211,13 @@ class OverviewTab extends Component
 
     protected function saveBirthday(): void
     {
-        if ($this->birthday) {
-            $data = [
-                'user_id'      => $this->person->user_id,
-                'date'         => $this->birthday,
-                'year_unknown' => $this->birthdayYearUnknown,
-                'type'         => 'birthday',
-                'is_recurring' => true,
-                'significance' => 3,
-                'logged_at'    => now(),
-            ];
-
-            if ($this->birthdayKeyDateId) {
-                $kd = KeyDate::find($this->birthdayKeyDateId);
-                if ($kd) {
-                    $kd->update($data);
-                }
-            } else {
-                $kd = KeyDate::create($data);
-                $kd->persons()->attach($this->person->id, ['is_primary' => true]);
-                $this->birthdayKeyDateId = $kd->id;
-            }
-        } else {
-            // Birthday cleared — delete the KeyDate if one exists
-            if ($this->birthdayKeyDateId) {
-                KeyDate::find($this->birthdayKeyDateId)?->delete();
-                $this->birthdayKeyDateId = null;
-            }
-        }
+        $this->birthdayKeyDateId = (new SavePersonKeyDate)
+            ->execute($this->person, 'birthday', $this->birthday, $this->birthdayYearUnknown)?->id;
     }
 
     protected function saveDeath(): void
     {
-        if (!$this->deathDate) {
-            // Death date cleared — delete the KeyDate if one exists
-            if ($this->deathKeyDateId) {
-                KeyDate::find($this->deathKeyDateId)?->delete();
-                $this->deathKeyDateId = null;
-            }
-            return;
-        }
-
-        $data = ['date' => $this->deathDate, 'logged_at' => now()];
-
-        $kd = $this->deathKeyDateId ? KeyDate::find($this->deathKeyDateId) : null;
-        if ($kd) {
-            $kd->update($data);
-            return;
-        }
-
-        $kd = KeyDate::create($data + [
-            'user_id'          => $this->person->user_id,
-            'year_unknown'     => false,
-            'type'             => 'death',
-            'is_recurring'     => true,
-            'recurrence_count' => 3,
-            'significance'     => 4,
-        ]);
-        $kd->persons()->attach($this->person->id, ['is_primary' => true]);
-        $this->deathKeyDateId = $kd->id;
+        $this->deathKeyDateId = (new SavePersonKeyDate)->execute($this->person, 'death', $this->deathDate)?->id;
     }
 
     public function render()

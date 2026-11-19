@@ -10,6 +10,10 @@ trait DetachesPersonsOnDelete
 {
     protected static function bootDetachesPersonsOnDelete(): void
     {
-        static::deleting(fn($entry) => $entry->persons()->detach());
+        // A braced body, so it returns nothing: a model event listener that returns a value stops the
+        // listeners after it from running (a Goal's outcomes would then never be deleted)
+        static::deleting(function ($entry) {
+            $entry->persons()->detach();
+        });
     }
 }

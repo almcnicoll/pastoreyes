@@ -2,11 +2,12 @@
 
 namespace App\Livewire\People\PersonShow;
 
+use App\Actions\CreateEntry;
+use App\Actions\EntryRules;
 use App\Actions\SyncKeyDateToCalendar;
 use App\Livewire\Concerns\CatchesDbErrors;
 use App\Models\KeyDate;
 use App\Models\Person;
-use Illuminate\Validation\Rule;
 use Livewire\Component;
 
 class KeyDatesTab extends Component
@@ -80,16 +81,9 @@ class KeyDatesTab extends Component
 
     public function save(): void
     {
-        $this->validate([
-            'type'        => ['required', Rule::in(array_keys(KeyDate::TYPES))],
-            'recurrenceCount' => 'nullable|integer|min:1|max:100',
-            'date'        => 'required|date',
-            'label'       => 'nullable|string|max:500',
-            'significance' => 'required|integer|min:1|max:5',
-        ]);
+        $this->validate(EntryRules::livewire('key_date'));
 
         $data = [
-            'user_id'           => auth()->id(),
             'type'              => $this->type,
             'date'              => $this->date,
             'year_unknown'      => $this->yearUnknown,
@@ -97,17 +91,15 @@ class KeyDatesTab extends Component
             'is_recurring'      => $this->isRecurring,
             'recurrence_count'  => $this->isRecurring ? $this->recurrenceCount : null,
             'significance'      => $this->significance,
-            'logged_at'         => now(),
         ];
 
         if ($this->editingId) {
             $kd = KeyDate::findOrFail($this->editingId);
             abort_if($kd->user_id !== auth()->id(), 403);
-            $kd->update($data);
+            $kd->update($data + ['logged_at' => now()]);
         } else {
-            $kd = KeyDate::create($data);
-            // Attach to this person as primary
-            $kd->persons()->attach($this->person->id, ['is_primary' => true]);
+            // Attached to this person as primary
+            $kd = (new CreateEntry)->execute(auth()->id(), 'key_date', [$this->person->id], $data);
         }
 
         // Google Calendar sync handled via event/job (to be implemented)

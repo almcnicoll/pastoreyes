@@ -16,7 +16,7 @@ Eloquent casts rather than in controller/view code.
 ## Tech stack
 
 - **Laravel 12** (PHP 8.2+), SQLite by default (`database/database.sqlite`)
-- **Livewire 4** + **Alpine.js** for interactive server-rendered UI (no SPA/API layer)
+- **Livewire 4** + **Alpine.js** for interactive server-rendered UI (no SPA). A separate personal-token JSON API for AI agents lives under `/api/v1` (see below)
 - **Tailwind CSS** for styling
 - **Cytoscape.js** for the relationship graph/genogram view
 - **Laravel Socialite** for Google OAuth (login + Contacts/Calendar API access)
@@ -38,6 +38,7 @@ Eloquent casts rather than in controller/view code.
 | `PersonPhoto` | Photo attached to a person. |
 | `Task` | Follow-up/to-do items. |
 | `ContactSyncState` / `ContactSyncReview` | Track Google Contacts import/sync state and surface conflicts for manual review. |
+| `ApiToken` | A personal API token (hashed, scoped read/write/delete, optional expiry, revocable). `api_audit_log` records what each did; `api_idempotency_keys` makes retried POSTs safe. |
 | `TimelineEntry` | A DB view unifying notes/goals/outcomes/key dates into one chronological, filterable feed (see `2024_01_01_000013_create_timeline_entries_view.php`). |
 
 ## Terminology
@@ -118,7 +119,24 @@ every five minutes: `*/5 * * * * cd /path-to-project && php artisan schedule:run
   and an authenticated group (`dashboard`, `people`, `people/{person}`, `timeline`,
   `tasks`, `contact-sync`, `settings`) gated by `auth` + `active` (`EnsureUserIsActive`)
   middleware.
-- Pages are full-page Livewire components (`app/Livewire/*`), not a REST API —
-  the browser talks to Livewire's own endpoints under the hood.
+- Pages are full-page Livewire components (`app/Livewire/*`); the browser talks to Livewire's own endpoints under the hood. The only REST surface is the agent API below.
 - Person pickers: one `person-picker` Livewire component (single/multi, bind with `wire:model`) over `App\Services\PersonSearch`, which matches every name a person has. The nav search uses the same helper.
-- `app/Actions/` holds import/export/sync operations too heavy for a controller method.
+- `app/Actions/` holds import/export/sync operations too heavy for a controller method, and the write logic the web UI and the API share
+  (`CreateEntry`, `RecordOutcome`, `ResolvePrayerNeed`, `SaveTask`, `SavePersonKeyDate`, plus `EntryRules`, the validation rules for entries).
+  Change entry behaviour there, not in a Livewire component or an API controller.
+
+## API for agents (`/api/v1`)
+
+Full reference: `doc/api.md`. In short:
+
+- `routes/api.php` registers routes from `App\Services\Api\Spec`, the single endpoint list that also produces `GET /api/v1` and `openapi.json`.
+- `ApiGate` middleware: HTTPS, bearer token (`ApiToken`, SHA-256 hashed), scope, per-token rate limit, `Cache-Control: no-store`, then an audit row
+  (method/path/status/summary only). It signs the token's owner in for the request because `EncryptedCast` needs the user. `ApiIdempotency` handles `Idempotency-Key`.
+- Every response is the envelope `{status, message, data, warnings, next, meta}` (`ApiResponse`); exceptions under `/api/*` are mapped into it (`ApiExceptions`).
+  `message` comes from deterministic templates in `Narrator` (no LLM, no pronouns inferred from gender).
+- People are referred to by a *PersonRef* resolved by `PersonResolver` (all names, hints, exact-beats-partial, closest-name suggestions) over `PersonContext`,
+  which batch-loads birthdays, counts, cities and relationships for one request. Names are encrypted, so matching happens in PHP (nothing is indexed or cached across requests).
+  `PersonSearch` holds the shared word-matching rule that the nav search and person pickers also use. **Writes never choose between ambiguous people.**
+- Controllers (`app/Http/Controllers/Api`) keep per-request state on the request, not on themselves. Entries and tasks created through the API carry `source = 'api'` and the token name.
+- Tests: `tests/Feature/Api` (needs the SQLite test DB, so the MySQL-only `timeline_entries` view migrations are skipped there; the API itself reads the five entry tables directly)
+  and `tests/Unit/Api/NarratorTest.php`. `tests/Feature/UiSharedActionsTest.php` checks the web UI still goes through the shared actions.

@@ -2,10 +2,9 @@
 
 namespace App\Livewire;
 
+use App\Actions\CreateEntry;
+use App\Actions\EntryRules;
 use App\Livewire\Concerns\CatchesDbErrors;
-use App\Models\Goal;
-use App\Models\Note;
-use App\Models\PrayerNeed;
 use Livewire\Component;
 
 class QuickAddEntry extends Component
@@ -53,25 +52,16 @@ class QuickAddEntry extends Component
         $this->validate([
             'selectedPersonIds'   => 'required|array|min:1',
             'selectedPersonIds.*' => 'integer|exists:persons,id',
-            'type'        => 'required|in:note,prayer_need,goal',
-            // A goal needs a title, as on the person's Goals & Prayer tab; for the others it's optional
-            'title'       => ($this->type === 'goal' ? 'required' : 'nullable') . '|string|max:500',
-            'body'        => 'required|string',
-            'significance' => 'required|integer|min:1|max:5',
-            'date'        => 'required|date',
-            'targetDate'  => 'nullable|date',
-        ]);
+            'type'                => 'required|in:note,prayer_need,goal',
+        ] + EntryRules::livewire(in_array($this->type, ['prayer_need', 'goal'], true) ? $this->type : 'note'));
 
-        $entry = match($this->type) {
-            'note'        => $this->saveNote(),
-            'prayer_need' => $this->savePrayerNeed(),
-            'goal'        => $this->saveGoal(),
-        };
-
-        // First person selected is the primary one (same convention as Timeline::saveEdit)
-        foreach ($this->selectedPersonIds as $i => $personId) {
-            $entry->persons()->attach($personId, ['is_primary' => $i === 0]);
-        }
+        // The first person selected is the primary one (same convention as Timeline::saveEdit)
+        (new CreateEntry)->execute(auth()->id(), $this->type, $this->selectedPersonIds, [
+            'title'        => $this->title ?: null,
+            'body'         => $this->body,
+            'significance' => $this->significance,
+            'date'         => $this->date,
+        ] + ($this->type === 'goal' ? ['target_date' => $this->targetDate] : []));
 
         $label = config("entry_types.types.{$this->type}.label");
 
@@ -81,43 +71,6 @@ class QuickAddEntry extends Component
 
         $this->dispatch('notify', message: "{$label} added.");
         $this->dispatch('timeline-updated');
-    }
-
-    protected function saveNote(): Note
-    {
-        return Note::create([
-            'user_id'     => auth()->id(),
-            'title'       => $this->title ?: null,
-            'body'        => $this->body,
-            'significance' => $this->significance,
-            'date'        => $this->date,
-            'logged_at'   => now(),
-        ]);
-    }
-
-    protected function savePrayerNeed(): PrayerNeed
-    {
-        return PrayerNeed::create([
-            'user_id'     => auth()->id(),
-            'title'       => $this->title ?: null,
-            'body'        => $this->body,
-            'significance' => $this->significance,
-            'date'        => $this->date,
-            'logged_at'   => now(),
-        ]);
-    }
-
-    protected function saveGoal(): Goal
-    {
-        return Goal::create([
-            'user_id'     => auth()->id(),
-            'title'       => $this->title,
-            'body'        => $this->body,
-            'significance' => $this->significance,
-            'date'        => $this->date,
-            'target_date' => $this->targetDate,
-            'logged_at'   => now(),
-        ]);
     }
 
     public function closeModal(): void
