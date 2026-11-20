@@ -276,7 +276,7 @@ export const tools: Tool[] = [
     description: 'Create a new person. Check with find_person first that they do not exist already. A probable duplicate (same name, compatible birth date) is refused with possible_duplicate: tell the user and only resend with confirm_duplicate if they say it is someone different. Needs at least a name.',
     schema: {
       first_name: z.string().optional(), last_name: z.string().optional(), middle_names: z.string().optional(), preferred_name: z.string().optional(),
-      gender: z.enum(['male', 'female', 'unknown']).optional().describe('Only if the user said'), born: z.string().optional().describe('YYYY-MM-DD, or MM-DD with born_year_unknown'),
+      gender: z.enum(['male', 'female', 'unknown']).optional().describe('Only if the user said'), born: z.string().optional().describe('YYYY-MM-DD. If only the day and month are known, use the current year and set born_year_unknown: true'),
       born_year_unknown: z.boolean().optional(), about: z.string().optional().describe('Background in the user\'s words'),
       addresses: z.array(z.object({ line_1: z.string().optional(), line_2: z.string().optional(), line_3: z.string().optional(), city: z.string().optional(), county: z.string().optional(), postcode: z.string().optional(), country: z.string().optional() })).optional(),
       confirm_duplicate: z.boolean().optional().describe('Only after the user agrees it is a different person'), ...DryRun,
