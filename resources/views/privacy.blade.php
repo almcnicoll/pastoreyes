@@ -147,7 +147,7 @@
 <p>PastorEyes&rsquo;s use and transfer to any other app of information received from Google APIs will adhere to the <a href="https://developers.google.com/terms/api-services-user-data-policy#additional_requirements_for_specific_api_scopes">Google API Services User Data Policy</a>, including the Limited Use requirements. In particular, for data received from Google Contacts and Google Calendar:</p>
 <ul>
     <li>We use it only to provide the user-facing features described in section 2.3.</li>
-    <li>We do not transfer it to anyone else, except as necessary to provide those features (see section 8), for security purposes such as investigating abuse or a bug, to comply with the law, or with your explicit consent.</li>
+    <li>We do not transfer it to anyone else, except as necessary to provide those features (see section 8), for security purposes such as investigating abuse or a bug, to comply with the law, or with your explicit consent (which includes you creating a personal API token and giving it to a program or AI assistant, as described in section 2.5).</li>
     <li>We do not use it, or sell it, for advertising (including retargeting, personalised or interest-based advertising), and we do not sell it to data brokers or information resellers.</li>
     <li>We do not use it to decide credit-worthiness or lending.</li>
     <li>We do not use it to develop, improve or train generalised artificial intelligence or machine-learning models. PastorEyes does not use AI or machine learning on your data.</li>
