@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Livewire\ContactSyncReviews;
+use App\Models\ContactSyncState;
+use App\Models\Person;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -34,6 +36,21 @@ class ContactSyncNowTest extends TestCase
             ->assertSee('Sync now')
             ->call('syncNow')
             ->assertDispatched('notify', fn ($name, $params) => str_starts_with($params['message'], 'Synced '));
+    }
+
+    public function test_sync_now_starts_from_the_first_contact_even_if_the_hourly_cursor_is_at_the_end(): void
+    {
+        Http::fake(['*' => Http::response([])]);
+        $user = $this->user(true);
+        $this->actingAs($user);
+        $person = Person::create(['user_id' => $user->id, 'google_contact_id' => 'people/c1']);
+        $state = ContactSyncState::forUser($user);
+        $state->last_person_id = $person->id; // hourly job has already been through everyone
+        $state->save();
+
+        Livewire::test(ContactSyncReviews::class)
+            ->call('syncNow')
+            ->assertDispatched('notify', fn ($name, $params) => str_starts_with($params['message'], 'Synced 1 '));
     }
 
     public function test_sync_now_asks_a_disconnected_user_to_connect_google(): void

@@ -29,6 +29,7 @@ class ContactSyncReviews extends Component
         }
 
         try {
+            ContactSyncState::forUser($user)->reset(); // start from the first contact, not wherever the hourly job stopped
             $result = (new ContactSyncService($user, 99999))->runBatch();
             $this->dispatch('notify', message: "Synced {$result['processed']} contacts; {$result['flagged']} differences found.");
         } catch (\Exception $e) {
