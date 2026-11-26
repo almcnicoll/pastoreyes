@@ -133,9 +133,9 @@
     <li><strong>Writing back.</strong> Only when you choose to push a flagged difference to Google does PastorEyes change that contact&rsquo;s name, birthday or address in Google Contacts. PastorEyes never creates or deletes Google contacts and changes nothing else.</li>
 </ul>
 
-<p><strong>Google Calendar</strong> (scopes: <code>https://www.googleapis.com/auth/calendar.calendarlist.readonly</code> and <code>https://www.googleapis.com/auth/calendar.events</code>):</p>
+<p><strong>Google Calendar</strong> (scopes: <code>https://www.googleapis.com/auth/calendar.calendarlist.readonly</code> and <code>https://www.googleapis.com/auth/calendar.events.owned</code>):</p>
 <ul>
-    <li><strong>Listing calendars.</strong> PastorEyes lists the calendars you can edit so you can choose where key dates are synced. Calendar names are displayed only; the identifier of the calendar you choose is saved.</li>
+    <li><strong>Listing calendars.</strong> PastorEyes lists the calendars you own so you can choose where key dates are synced. Calendar names are displayed only; the identifier of the calendar you choose is saved.</li>
     <li><strong>Creating, updating and deleting events.</strong> When you choose to sync a key date, PastorEyes creates an event in your chosen calendar. The event title is the key date&rsquo;s label or type, and the event description lists the names of the people the key date concerns. PastorEyes updates or deletes that event when you change or delete the key date in PastorEyes, or choose a different calendar. The event&rsquo;s Google identifier is saved.</li>
     <li><strong>Reading changes back.</strong> When you open a person&rsquo;s page, PastorEyes re-reads the events it created and, if you have changed an event&rsquo;s date or title in Google Calendar, copies that change into the matching key date.</li>
     <li>PastorEyes does not read, copy or change any other event in your calendars.</li>

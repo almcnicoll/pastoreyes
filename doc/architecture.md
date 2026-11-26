@@ -84,7 +84,7 @@ relationships render with the correct label depending on viewing direction.
 plus `app/Actions/ImportPersonFromGoogle.php` and `SyncKeyDateToCalendar.php`:
 
 - Google Sign-In is the auth mechanism (`GoogleAuthController`). Scopes requested there: `openid profile email`,
-  `contacts` (read + push name/birthday/address back), `calendar.calendarlist.readonly` + `calendar.events`.
+  `contacts` (read + push name/birthday/address back), `calendar.calendarlist.readonly` + `calendar.events.owned` (so only calendars the user owns are offered).
   Keep them to what the code actually calls — they must match the OAuth consent screen, the privacy policy
   (`resources/views/privacy.blade.php` §2.3) and the verification demo video.
 - Disconnecting Google, or deleting an account, revokes the grant at Google (`GoogleClient::revokeToken`).

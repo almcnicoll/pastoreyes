@@ -21,9 +21,10 @@ class GoogleAuthController extends Controller
                 'profile',
                 'email',
                 'https://www.googleapis.com/auth/contacts',
-                // Narrowest Calendar scopes for what we do: list calendars, and create/read/update/delete events.
+                // Narrowest Calendar scopes for what we do: list calendars, and create/read/update/delete
+                // events on calendars the user owns (see GoogleCalendarService::getEditableCalendars).
                 'https://www.googleapis.com/auth/calendar.calendarlist.readonly',
-                'https://www.googleapis.com/auth/calendar.events',
+                'https://www.googleapis.com/auth/calendar.events.owned',
             ])
             ->with(['access_type' => 'offline', 'prompt' => 'consent'])
             ->redirect();

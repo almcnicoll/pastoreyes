@@ -36,9 +36,9 @@ class GoogleVerificationTest extends TestCase
         $url = urldecode($this->get('/auth/google/redirect')->assertRedirect()->headers->get('Location'));
 
         $this->assertStringContainsString('auth/contacts', $url);
-        $this->assertStringContainsString('auth/calendar.events', $url);
+        $this->assertStringContainsString('auth/calendar.events.owned', $url);
         $this->assertStringContainsString('auth/calendar.calendarlist.readonly', $url);
-        $this->assertDoesNotMatchRegularExpression('#auth/calendar(\s|&|$)#', $url);
+        $this->assertDoesNotMatchRegularExpression('#auth/calendar(\.events)?(\s|&|$)#', $url);
     }
 
     public function test_revoking_posts_the_refresh_token_to_google(): void

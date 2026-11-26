@@ -20,7 +20,8 @@ class GoogleCalendarService
     }
 
     /**
-     * Return all calendars the user can edit, suitable for a dropdown.
+     * Return the calendars the user owns, suitable for a dropdown. Owned only, because the
+     * calendar.events.owned scope doesn't cover calendars shared with the user.
      */
     public function getEditableCalendars(): Collection
     {
@@ -31,7 +32,7 @@ class GoogleCalendarService
         }
 
         return collect($response->json('items', []))
-            ->filter(fn($cal) => in_array($cal['accessRole'] ?? '', ['owner', 'writer']))
+            ->filter(fn($cal) => ($cal['accessRole'] ?? '') === 'owner')
             ->map(fn($cal) => [
                 'id'      => $cal['id'],
                 'summary' => $cal['summary'] ?? $cal['id'],
