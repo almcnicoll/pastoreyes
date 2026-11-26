@@ -102,14 +102,15 @@ class KeyDatesTab extends Component
             $kd = (new CreateEntry)->execute(auth()->id(), 'key_date', [$this->person->id], $data);
         }
 
-        // Google Calendar sync handled via event/job (to be implemented)
-        if ($this->syncToCalendar) {
-            $this->dispatch('sync-key-date-to-calendar', keyDateId: $kd->id, calendarId: $this->googleCalendarId);
-        }
-
         $verb = $this->editingId ? 'updated' : 'added';
+        $sync = $this->syncToCalendar ? [$kd->id, $this->googleCalendarId] : null;
         $this->resetForm();
         $this->dispatch('notify', message: "Key Date {$verb}.");
+
+        // Last, so its own toast ("Synced…" or the failure) is the one left showing
+        if ($sync) {
+            $this->syncKeyDate(...$sync);
+        }
     }
 
     public function delete(int $id): void
@@ -122,10 +123,7 @@ class KeyDatesTab extends Component
 
     public function syncNow(int $id): void
     {
-        $kd = KeyDate::findOrFail($id);
-        abort_if($kd->user_id !== auth()->id(), 403);
-        $this->dispatch('sync-key-date-to-calendar', keyDateId: $kd->id, calendarId: $kd->google_calendar_id);
-        $this->dispatch('notify', message: 'Sync initiated.');
+        $this->syncKeyDate($id); // ponytail: was dispatching an event nothing listened for
     }
 
     public function resetForm(): void
