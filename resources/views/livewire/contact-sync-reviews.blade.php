@@ -9,17 +9,22 @@
             </p>
         </div>
 
-        {{-- Sync status --}}
-        @if($syncState)
-            <div class="text-right text-xs text-gray-400">
+        {{-- Sync status + on-demand sync --}}
+        <div class="text-right text-xs text-gray-400">
+            @if($syncState)
                 @if($syncState->last_run_at)
                     <p>Last sync: {{ $syncState->last_run_at->diffForHumans() }}</p>
                     <p>Last batch: {{ $syncState->last_batch_size }} contacts</p>
                 @else
                     <p>No sync run yet</p>
                 @endif
-            </div>
-        @endif
+            @endif
+            <button wire:click="syncNow" wire:loading.attr="disabled" wire:target="syncNow"
+                    class="mt-1 px-3 py-1 text-xs font-medium border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 disabled:opacity-50">
+                <span wire:loading.remove wire:target="syncNow">Sync now</span>
+                <span wire:loading wire:target="syncNow">Syncing…</span>
+            </button>
+        </div>
     </div>
 
     {{-- Filter tabs + bulk actions --}}

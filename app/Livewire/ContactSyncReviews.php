@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\ContactSyncReview;
 use App\Models\ContactSyncState;
 use App\Services\ContactSyncResolutionService;
+use App\Services\ContactSyncService;
 use Livewire\Component;
 
 class ContactSyncReviews extends Component
@@ -15,6 +16,24 @@ class ContactSyncReviews extends Component
     public function setFilter(string $filter): void
     {
         $this->filter = $filter;
+    }
+
+    /** The hourly job's work for this user, on demand: every linked contact, not one batch. */
+    public function syncNow(): void
+    {
+        $user = auth()->user();
+
+        if (empty($user->google_oauth_refresh_token)) {
+            $this->dispatch('notify', message: 'Connect Google first (Settings → Google).');
+            return;
+        }
+
+        try {
+            $result = (new ContactSyncService($user, 99999))->runBatch();
+            $this->dispatch('notify', message: "Synced {$result['processed']} contacts; {$result['flagged']} differences found.");
+        } catch (\Exception $e) {
+            $this->dispatch('notify', message: "Couldn't sync: " . $e->getMessage());
+        }
     }
 
     public function pullToLocal(int $reviewId): void
