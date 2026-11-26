@@ -266,10 +266,19 @@ class ImportPersonFromGoogle
                 continue;
             }
 
+            // A "Birthday" typed as a custom date (rather than Google's Birthday field) arrives as an event.
+            $typeText = strtolower(($event['formattedType'] ?? '') . ' ' . $type);
+
             $keyDateType = match(true) {
+                str_contains($typeText, 'birthday') => 'birthday',
                 str_contains($type, 'anniversary') => 'wedding_anniversary',
                 default                            => 'other',
             };
+
+            // One birthday per person: the Birthday field (above) wins over a date that's merely labelled so.
+            if ($keyDateType === 'birthday' && $person->keyDates()->where('type', 'birthday')->exists()) {
+                continue;
+            }
 
             $yearUnknown = !isset($date['year']) || $date['year'] === 0;
             $year        = $yearUnknown ? now()->year : $date['year'];
@@ -282,7 +291,7 @@ class ImportPersonFromGoogle
                 continue;
             }
 
-            $label = $event['formattedType'] ?? ucfirst($type) ?: null;
+            $label = $keyDateType === 'birthday' ? null : ($event['formattedType'] ?? ucfirst($type) ?: null);
 
             $kd = KeyDate::create([
                 'user_id'      => auth()->id(),
