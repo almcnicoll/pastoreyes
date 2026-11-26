@@ -55,6 +55,8 @@ class GoogleAuthController extends Controller
                 'first_name'        => $googleUser->user['given_name'] ?? '',
                 'last_name'         => $googleUser->user['family_name'] ?? '',
                 'encryption_salt'   => \Illuminate\Support\Str::random(64),
+                // Set explicitly: a freshly created model doesn't carry the DB default, so is_active would read as null.
+                'is_active'         => true,
             ]
         );
 
