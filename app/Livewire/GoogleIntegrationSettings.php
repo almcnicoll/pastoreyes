@@ -22,6 +22,10 @@ class GoogleIntegrationSettings extends Component
 
     public function loadCalendars(): void
     {
+        if (blank(auth()->user()->google_oauth_token)) {
+            return; // disconnected: nothing to load (and no error to show)
+        }
+
         $this->loadingCalendars = true;
         $this->calendarsError   = false;
 
@@ -59,6 +63,7 @@ class GoogleIntegrationSettings extends Component
             'google_oauth_refresh_token' => null,
             'google_token_expires_at'    => null,
         ]);
+        $this->calendars = [];
         $this->dispatch('notify', message: 'Google account disconnected.');
     }
 

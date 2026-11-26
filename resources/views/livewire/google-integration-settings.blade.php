@@ -3,6 +3,7 @@
     {{-- Connection Status --}}
     <div>
         <h3 class="text-sm font-semibold text-gray-700 mb-2">Google Account</h3>
+        @if(filled(auth()->user()->google_oauth_token))
         <div class="flex items-center gap-3 bg-green-50 border border-green-200 rounded-lg px-4 py-3">
             <div class="w-2 h-2 rounded-full bg-green-500 flex-shrink-0"></div>
             <div class="flex-1 min-w-0">
@@ -21,9 +22,21 @@
                 (auto-refreshed when needed)
             </p>
         @endif
+        @else
+        <div class="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">
+            <div class="w-2 h-2 rounded-full bg-gray-400 flex-shrink-0"></div>
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-gray-700">Not connected</p>
+                <p class="text-xs text-gray-500">PastorEyes has no access to your Google Contacts or Calendar.</p>
+            </div>
+            <a href="{{ route('auth.google.redirect') }}"
+               class="text-xs text-indigo-600 hover:underline flex-shrink-0">Reconnect</a>
+        </div>
+        @endif
     </div>
 
     {{-- Default Calendar --}}
+    @if(filled(auth()->user()->google_oauth_token))
     <div>
         <h3 class="text-sm font-semibold text-gray-700 mb-2">Default Calendar</h3>
         <p class="text-xs text-gray-400 mb-3">
@@ -68,6 +81,7 @@
             </div>
         @endif
     </div>
+    @endif
 
     {{-- Contacts Integration Note --}}
     <div>
